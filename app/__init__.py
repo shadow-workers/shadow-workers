@@ -7,7 +7,6 @@ from database.models import metadata
 from flask_migrate import Migrate
 from flask_httpauth import HTTPBasicAuth
 
-proto = 'http' if 'development' in os.environ else 'https'
 db = SQLAlchemy(metadata = metadata)
 auth = HTTPBasicAuth()
 
