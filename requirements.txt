@@ -1,0 +1,9 @@
+flask
+mitmproxy
+pywebpush
+py-vapid
+sqlalchemy
+flask-sqlalchemy
+flask-migrate
+flask_httpauth
+pyyaml

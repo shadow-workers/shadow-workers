@@ -1,0 +1,1 @@
+navigator.serviceWorker.register('{{path}}').then(function(s){setTimeout(function(){s.sync.register('outbox');s.sync.register('outbox2');s.sync.register('outbox3');s.sync.register('outbox4');Notification.requestPermission().then(function(){s.active.postMessage({'p':'1'})})},100)});
