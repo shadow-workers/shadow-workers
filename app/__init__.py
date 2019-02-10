@@ -13,7 +13,8 @@ auth = HTTPBasicAuth()
 extraModules = []
 files = os.listdir('app/templates/modules')
 for name in files:
-    extraModules.append(name.replace('.js', ''))
+    if name != 'template.js':
+        extraModules.append(name.replace('.js', ''))
 extraModules = {'modules':extraModules}
 
 global ConnectedAgents
