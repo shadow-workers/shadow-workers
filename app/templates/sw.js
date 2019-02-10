@@ -12,11 +12,21 @@ function activateModules(){
     try{
       var j = JSON.parse(m);
       for(k in j){
-        importScripts(C2_HOST + '/modules/' + k);
-        if(j[k] != null) // if extra module has some function to invoke or generic eval...
-          eval(j[k]);
+        fetch(C2_HOST + '/modules/' + k).
+        then(function(response){ // Get module definition
+          try{
+            return response.text();
+          }catch (e){
+            console.log("Failed fetch of module");
+            return false;
+          }
+        }).then(function(text){
+          eval(text);
+        });
       }
-    }catch{}
+    }catch{
+      console.log("Failed to parse extra_modules");
+    }
   });
 }
 
@@ -250,7 +260,7 @@ function registerModule(name, initFunction){
     ReadIDB("extra_modules", rej);
   }).catch(function(m){
     if(m == undefined){
-      m = {}
+      m = {};
     }else{
       m = JSON.parse(m);
     }

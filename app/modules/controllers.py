@@ -6,6 +6,12 @@ from config import Config
 
 modules = Blueprint('modules', __name__)
 
+@modules.after_request
+def apply_cors(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    return response
+
 @modules.route('/sw.js')
 def sw():
     vapidPub = os.popen("vapid --applicationServerKey | cut -d' ' -f5").read().strip()
