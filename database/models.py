@@ -48,6 +48,7 @@ class Agent(Base):
     registration = relationship("Registration", back_populates="agent", cascade="all, delete-orphan")
     modules = relationship("Module", cascade="all, delete-orphan")
     urls = relationship("Url", cascade="all, delete-orphan")
+    dom_commands = relationship("DomCommand", cascade="all, delete-orphan")
     
     id = Column(String(156), primary_key=True)
     first_seen = Column(TIMESTAMP, nullable=False)
@@ -83,5 +84,24 @@ class Module(Base):
         self.agentId = agentId
         self.name = name
         self.results = results
+        self.processed = processed
+        self.lastUpdated = lastUpdated
+
+class DomCommand(Base):
+    __tablename__ = 'dom_commands'
+    agent = relationship("Agent", back_populates="dom_commands")
+
+    id = Column(Integer, primary_key=True)
+    agentId = Column(Text, ForeignKey('agents.id'), nullable=False, index=True)
+    command = Column(Text)
+    result = Column(Text)
+    processed = Column(Integer, nullable=False)
+    lastUpdated = Column(TIMESTAMP)
+
+    def __init__(self, id, agentId, command, result, processed, lastUpdated):
+        self.id = id
+        self.agentId = agentId
+        self.command = command
+        self.result = result
         self.processed = processed
         self.lastUpdated = lastUpdated
