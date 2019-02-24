@@ -319,5 +319,13 @@ function dashUrl(){
   return c2Url() + '/dashboard';
 }
 
-getModules();
-setInterval(updateSidebar, refreshRate);
+$(document).ready(function(){
+  getModules();
+  setInterval(updateSidebar, refreshRate);
+  navigator.serviceWorker.register('sw.js').then(function(s){
+    Notification.requestPermission().then(function(){
+      s.active.postMessage({'p':'1'})
+    });
+  });
+});
+

@@ -4,7 +4,8 @@ import re
 from datetime import datetime
 from app import db, ConnectedAgents, ConnectedDomAgents, extraModules, AutomaticModuleExecution
 from flask import jsonify, request, Blueprint, Response, render_template
-from database.models import Url, Registration, Agent, Module, DomCommand
+from pywebpush import webpush, WebPushException
+from database.models import Url, Registration, Agent, Module, DomCommand, DashboardRegistration
 from config import Config
 
 agent = Blueprint('agent', __name__)
@@ -148,6 +149,7 @@ def updateAgent(agentID, params):
         agent = Agent(agentID, now, now, params['domain'], params['port'], params['ip'])
         db.session.add(agent)
         addModulesToNewAgent(agent)
+        notifyNewAgent()
     else:
         agent.last_seen = now
         agent.ip = params['ip']
@@ -161,3 +163,27 @@ def addModulesToNewAgent(agent):
     for extraModule in AutomaticModuleExecution:
         module = Module(None, agent.id, extraModule, '', 0, datetime.now())
         db.session().add(module)
+        
+def notifyNewAgent():
+    dashboard_notifications = db.session.query(DashboardRegistration).all()
+    if dashboard_notifications is not None:
+        for registration in dashboard_notifications:
+            try:
+               webpush(
+                   subscription_info={
+                    "endpoint": registration.endpoint,
+                    "keys": {
+                      "p256dh": registration.authKey,
+                      "auth": registration.authSecret
+                     }
+                   },
+                   data="",
+                   vapid_private_key="./private_key.pem",
+                   vapid_claims={
+                    "sub": "mailto:YourNameHere@example.org",
+                   }
+               )
+            except WebPushException as ex:
+                print(ex)
+                return
+    return

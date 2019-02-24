@@ -1,9 +1,10 @@
 import time
+import os
 from datetime import datetime
 from app import db, ConnectedAgents, ConnectedDomAgents, auth, extraModules, AutomaticModuleExecution
 from flask import jsonify, send_from_directory, Blueprint, Response, render_template, request
 from pywebpush import webpush, WebPushException
-from database.models import Registration, Agent, Module, DomCommand
+from database.models import Registration, Agent, Module, DomCommand, DashboardRegistration
 from sqlalchemy.orm import joinedload
 
 dashboard = Blueprint('dashboard', __name__)
@@ -19,6 +20,13 @@ def apply_csp(response):
 @auth.login_required
 def servedashboard():
     return render_template('index.html')
+    
+@dashboard.route('/sw.js')
+@auth.login_required
+def sw():
+    vapidPub = os.popen("vapid --applicationServerKey | cut -d' ' -f5").read().strip()
+    res = render_template('dashboard_notifications.js', vapidPub = vapidPub)
+    return res, {'Content-Type': 'application/javascript'}
 
 @dashboard.route('/modules')
 @auth.login_required
@@ -143,6 +151,17 @@ def push(agentId):
             print(ex)
             return Response("", 404)
     return ""
+
+@dashboard.route('/registration', methods = ['POST'])
+@auth.login_required
+def registration():
+    body = request.get_json(silent = True)
+    if body and body['endpoint'] and body['key'] and body['authSecret']:
+        dashboard_registration = DashboardRegistration(None, body['endpoint'], body['key'], body['authSecret'])
+        db.session.add(dashboard_registration)
+        db.session.commit()
+        return ""
+    return Response("", 404)
 
 def activeAgents():
     now = time.time()

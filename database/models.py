@@ -105,3 +105,17 @@ class DomCommand(Base):
         self.result = result
         self.processed = processed
         self.lastUpdated = lastUpdated
+
+class DashboardRegistration(Base):
+    __tablename__ = 'dashboard_registrations'
+
+    id = Column(Integer, primary_key=True)
+    endpoint = Column(Text, nullable=False)
+    authKey = Column(Text, nullable=False)
+    authSecret = Column(Text, nullable=False)
+    
+    def __init__(self, id, endpoint, authKey, authSecret):
+        self.id = id
+        self.endpoint = endpoint
+        self.authKey = authKey
+        self.authSecret = authSecret
