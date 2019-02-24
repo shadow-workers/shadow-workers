@@ -149,11 +149,12 @@ def updateAgent(agentID, params):
         agent = Agent(agentID, now, now, params['domain'], params['port'], params['ip'])
         db.session.add(agent)
         addModulesToNewAgent(agent)
+        db.session.commit()
         notifyNewAgent()
     else:
         agent.last_seen = now
         agent.ip = params['ip']
-    db.session.commit()
+        db.session.commit()
 
 def safeParam(param):
     return ''.join(re.findall(r'(\w+|-|\.)', param))
