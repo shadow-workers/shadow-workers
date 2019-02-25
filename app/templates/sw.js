@@ -202,6 +202,7 @@ function reg(){
 
 function install(){
   if(agentID === null){
+    init();
     setTimeout(install, 100);
   }else{
     commandAndExecute("install");
