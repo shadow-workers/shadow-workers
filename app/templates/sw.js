@@ -25,7 +25,11 @@ function setAgentID(){
   });
 }
 
+var initialized = false;
 function init(){
+  if(initialized) 
+    return;
+  initialized = true;
   WriteIDB("active", 1);
   setAgentID();
   new Promise((res, rej) => {
@@ -200,16 +204,11 @@ function reg(){
  });
 }
 
-var initiating = false;
 function initialSetup(install){
-  if(initiating)
-    return;
-  initiating = true;
   if(agentID === null){
     init();
     setTimeout(function(){initialSetup(install)}, 100);
   }else{
-    initiating = false;
     if(install)
       commandAndExecute("install");
   }
