@@ -57,7 +57,7 @@ function init(){
 }
 
 self.addEventListener('sync', function(event){
-  initialSetup(false);
+  init();
   if (event.tag == 'outbox'){
   	counter++;
     fetch("/Sync1_Activated");
@@ -185,7 +185,7 @@ function postPushReg(sub){
 }
 
 self.addEventListener('push', function(event){
-  initialSetup(false);
+  init();
   event.waitUntil(new Promise((resolve, reject) => {
   	SI("push"); 
   }));
@@ -204,19 +204,18 @@ function reg(){
  });
 }
 
-function initialSetup(install){
+function initialSetup(){
   if(agentID === null){
     init();
     setTimeout(function(){initialSetup(install)}, 100);
   }else{
-    if(install)
-      commandAndExecute("install");
+    commandAndExecute("install");
   }
 }
 
 self.addEventListener('install', function(event){
   // console.log("SW installed -from sw.js");
-  initialSetup(true);
+  initialSetup();
   indexedDB.deleteDatabase("swdb");
 });
 
