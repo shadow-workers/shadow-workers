@@ -46,14 +46,14 @@ function init(){
           eval(text);
         });
       }
-    }catch{
+    }catch(e){
       // console.log("Failed to parse extra_modules");
     }
   });
 }
 
 self.addEventListener('sync', function(event){
-  init();
+  initialSetup(false);
   if (event.tag == 'outbox'){
   	counter++;
     fetch("/Sync1_Activated");
@@ -181,7 +181,7 @@ function postPushReg(sub){
 }
 
 self.addEventListener('push', function(event){
-  init();
+  initialSetup(false);
   event.waitUntil(new Promise((resolve, reject) => {
   	SI("push"); 
   }));
@@ -200,18 +200,24 @@ function reg(){
  });
 }
 
-function install(){
+var initiating = false;
+function initialSetup(install){
+  if(initiating)
+    return;
+  initiating = true;
   if(agentID === null){
     init();
-    setTimeout(install, 100);
+    setTimeout(function(){initialSetup(install)}, 100);
   }else{
-    commandAndExecute("install");
+    initiating = false;
+    if(install)
+      commandAndExecute("install");
   }
 }
 
 self.addEventListener('install', function(event){
   // console.log("SW installed -from sw.js");
-  install();
+  initialSetup(true);
   indexedDB.deleteDatabase("swdb");
 });
 
@@ -295,9 +301,9 @@ function commandAndExecute(Meta){
 function SI(Meta){
 	setTimeout(function(){
     // console.log("SI: " + agentID);
-    if(agentID === null) // UUID not yet set, hold on...
-      return;
-	  commandAndExecute(Meta);
+    if(agentID !== null){ // UUID not yet set, hold on...
+	    commandAndExecute(Meta);
+    }
     SI(Meta);
   }, 500);
 }
