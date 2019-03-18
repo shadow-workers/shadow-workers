@@ -1,8 +1,6 @@
 function templateModuleLogic(){
   // do stuff
-  data = new FormData();
-  data.append('result', "whatever");
-  sendModuleResultToC2('template', data);
+  sendModuleResultToC2('template', "whatever");
   deregisterModule('template');
 }
 
