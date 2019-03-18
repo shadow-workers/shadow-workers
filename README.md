@@ -57,9 +57,10 @@ function MODULE_NAME_Logic(){
 	deregisterModule('MODULE_NAME');
 }
 ```
-8. As a starting point for your module please refer to a module template under `app/templates/modules/template.js`
-9. Any results you send from the module will end up being visible on the dashboard under the agent that ran it
-10. If you want to run the module again after it has already been executed, you can delete the module against the agent on the dashboard and execute it again
+8. Note that all the global variable names need to be prefixed with your module name. Your module logic will end up being included as part of the main SW, so variables could conflict.
+9. As a starting point for your module please refer to a module template under `app/templates/modules/template.js`.
+10. Any results you send from the module will end up being visible on the dashboard under the agent that ran it.
+11. If you want to run the module again after it has already been executed, you can delete the module against the agent on the dashboard and execute it again.
 
 ## License
 
