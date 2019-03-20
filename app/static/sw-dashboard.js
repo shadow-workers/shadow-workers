@@ -64,7 +64,14 @@ function updateDisplayStatus(){
 
 function checkAgentShownStatus(){
   if(agentDisplayed !== null){
+    if(agentDisplayed.active === 'true' && !(agentDisplayed.id in agents)){
+      // if was active and now not
       showAgent(agentDisplayed.id);
+    }
+    if(agentDisplayed.active === 'false' && !(agentDisplayed.id in dormantAgents)){
+      // if was dormant and now awake
+      showAgent(agentDisplayed.id);
+    }
   }
 }
 
