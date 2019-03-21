@@ -134,10 +134,10 @@ function showAgent(agentID){
           `;
         if(agent.dom_commands){
             agentHtml += `<hr/>`;
-            for(var dom_command in agent.dom_commands){
-              agentHtml += `<p><i>${dom_command}</i>`;
-              if(dom_command['result'] !== undefined){
-                agentHtml += `<br/>${dom_command['result']}</p>`;
+            for(var cmd in agent.dom_commands){
+              agentHtml += `<p><i>${cmd}</i>`;
+              if(agent.dom_commands[cmd] != null){
+                agentHtml += `<br/>${agent.dom_commands[cmd]}</p>`;
               }
               agentHtml += `<hr/>`;
             }
