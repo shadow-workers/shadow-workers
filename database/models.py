@@ -56,14 +56,16 @@ class Agent(Base):
     domain = Column(Text, nullable=False)
     port = Column(Text, nullable=False)
     ip = Column(Text, nullable=False)
+    user_agent = Column(Text, nullable=True)
     
-    def __init__(self, id, first_seen, last_seen, domain, port, ip):
+    def __init__(self, id, first_seen, last_seen, domain, port, ip, user_agent):
         self.id = id
         self.first_seen = first_seen
         self.last_seen = last_seen
         self.domain = domain
         self.port = port
         self.ip = ip
+        self.user_agent = user_agent
         
     def to_json(agent):
         return {'id': agent.id, 'first_seen': agent.first_seen, 'last_seen': agent.last_seen, 'domain': agent.domain, 'port': agent.port, 'ip': agent.ip}
