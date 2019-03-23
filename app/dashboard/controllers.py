@@ -13,7 +13,8 @@ AGENT_TIMEOUT = 8
 
 @dashboard.after_request
 def apply_csp(response):
-    response.headers["Content-Security-Policy"] = "script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; media-src 'self'; frame-src 'self'; frame-ancestors 'none'"
+    #style-src 'self'; 
+    response.headers["Content-Security-Policy"] = "script-src 'self'; img-src 'self'; font-src 'self'; media-src 'self'; frame-src 'self'; frame-ancestors 'none'"
     return response
 
 @dashboard.route('/')
