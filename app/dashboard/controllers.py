@@ -2,7 +2,7 @@ import time
 import os
 from datetime import datetime
 from app import db, ConnectedAgents, ConnectedDomAgents, auth, extraModules, AutomaticModuleExecution
-from flask import jsonify, send_from_directory, Blueprint, Response, render_template, request
+from flask import jsonify, send_from_directory, Blueprint, Response, render_template, request, escape
 from pywebpush import webpush, WebPushException
 from database.models import Registration, Agent, Module, DomCommand, DashboardRegistration
 from sqlalchemy.orm import joinedload
@@ -55,12 +55,12 @@ def getAgent(agentID):
             if len(modules) != 0:
                 result['modules'] = {}
                 for module in modules:
-                    result['modules'][module.name] = module.results
+                    result['modules'][module.name] = escape(module.results)
             dom_commands = db.session().query(DomCommand).filter(DomCommand.agentId == agentID, DomCommand.processed == 1).order_by(DomCommand.id.desc()).limit(3).all()
             if len(dom_commands) != 0:
                 result['dom_commands'] = {}
                 for dom_command in dom_commands:
-                    result['dom_commands'][dom_command.command] = dom_command.result
+                    result['dom_commands'][escape(dom_command.command)] = escape(dom_command.result)
             return jsonify(result)
     return Response("", 404)
 
