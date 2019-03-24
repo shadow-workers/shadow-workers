@@ -199,17 +199,20 @@ def registration():
 def activeAgents():
     now = time.time()
     agentsToRemove = {}
-    for agentID in ConnectedAgents:
-        if (now - ConnectedAgents[agentID]['last_seen']) > AGENT_TIMEOUT:
-            agentsToRemove[agentID] = ConnectedAgents[agentID]
-    for agentID in agentsToRemove:
-        del ConnectedAgents[agentID]
-    agentsToRemove = {}
+    # remove DOM agents that timed out
     for agentID in ConnectedDomAgents:
         if (now - ConnectedDomAgents[agentID]['last_seen']) > AGENT_TIMEOUT:
             agentsToRemove[agentID] = ConnectedDomAgents[agentID]
     for agentID in agentsToRemove:
         del ConnectedDomAgents[agentID]
+    agentsToRemove = {}
+    # remove SW agents that timed out
+    for agentID in ConnectedAgents:
+        if (now - ConnectedAgents[agentID]['last_seen']) > AGENT_TIMEOUT:
+            agentsToRemove[agentID] = ConnectedAgents[agentID]
+            ConnectedAgents[agentID]['domActive'] = 'true' if agentID in ConnectedDomAgents else 'false'
+    for agentID in agentsToRemove:
+        del ConnectedAgents[agentID]
 
 def dormantAgents():
     agents = db.session().query(Agent).options(joinedload('registration')).filter(Agent.id.notin_(ConnectedAgents.keys())).all()
@@ -218,6 +221,7 @@ def dormantAgents():
         results[agent.id] = Agent.to_json(agent)
         results[agent.id]['push'] = str(agent.registration is not None).lower()
         results[agent.id]['active'] = 'false'
+        results[agent.id]['domActive'] = 'true' if agent.id in ConnectedDomAgents else 'false'
     return results
 
 def loadAgentModule(moduleName, agentID):
