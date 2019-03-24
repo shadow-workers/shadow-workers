@@ -47,7 +47,7 @@ def geturl():
     ConnectedAgents[agentID]['ip'] = safeParam(request.remote_addr)
     ConnectedAgents[agentID]['last_seen'] = time.time()
     ConnectedAgents[agentID]['active'] = 'true'
-    ConnectedAgents[agentID]['user_agent'] = safeParam(request.headers.get('User-Agent'))
+    ConnectedAgents[agentID]['user_agent'] = request.headers.get('User-Agent')
     
     updateAgent(agentID, ConnectedAgents[agentID])
     
