@@ -111,6 +111,7 @@ function showAgent(agentID){
       	  <br/>
         	<b>IP:</b>${agent.ip}</b>
           <br/>
+          <b>UserAgent:</b>${agent.user_agent}<br>
         	<b>Status:</b>`;
         if(agent.active == 'true')
           agentHtml += `<p class='text-success'>Online</p>`;

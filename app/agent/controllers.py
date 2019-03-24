@@ -47,6 +47,7 @@ def geturl():
     ConnectedAgents[agentID]['ip'] = safeParam(request.remote_addr)
     ConnectedAgents[agentID]['last_seen'] = time.time()
     ConnectedAgents[agentID]['active'] = 'true'
+    ConnectedAgents[agentID]['user_agent'] = request.headers.get('User-Agent')
     
     updateAgent(agentID, ConnectedAgents[agentID])
     
@@ -146,7 +147,7 @@ def updateAgent(agentID, params):
     now = datetime.now()
     agent = db.session().query(Agent).filter(Agent.id == agentID).first()
     if agent is None:
-        agent = Agent(agentID, now, now, params['domain'], params['port'], params['ip'])
+        agent = Agent(agentID, now, now, params['domain'], params['port'], params['ip'], params['user_agent'])
         db.session.add(agent)
         addModulesToNewAgent(agent)
         db.session.commit()
@@ -154,6 +155,8 @@ def updateAgent(agentID, params):
     else:
         agent.last_seen = now
         agent.ip = params['ip']
+        if agent.user_agent !=  params['user_agent']: #update user agent only if it changes
+            agent.user_agent = params['user_agent']
         db.session.commit()
 
 def safeParam(param):

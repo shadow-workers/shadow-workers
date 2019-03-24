@@ -2,7 +2,7 @@ import time
 import os
 from datetime import datetime
 from app import db, ConnectedAgents, ConnectedDomAgents, auth, extraModules, AutomaticModuleExecution
-from flask import jsonify, send_from_directory, Blueprint, Response, render_template, request
+from flask import jsonify, send_from_directory, Blueprint, Response, render_template, request, escape
 from pywebpush import webpush, WebPushException
 from database.models import Registration, Agent, Module, DomCommand, DashboardRegistration
 from sqlalchemy.orm import joinedload
@@ -50,6 +50,7 @@ def getAgent(agentID):
             result['push'] = str(registration is not None).lower()
             result['active'] = 'true' if agent.id in ConnectedAgents else 'false'
             result['domActive'] = 'true' if agent.id in ConnectedDomAgents else 'false'
+            result['user_agent'] = escape(agent.user_agent)
             modules = db.session().query(Module).filter(Module.agentId == agentID, Module.processed == 1).all()
             if len(modules) != 0:
                 result['modules'] = {}
