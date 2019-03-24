@@ -50,6 +50,7 @@ def getAgent(agentID):
             result['push'] = str(registration is not None).lower()
             result['active'] = 'true' if agent.id in ConnectedAgents else 'false'
             result['domActive'] = 'true' if agent.id in ConnectedDomAgents else 'false'
+            result['user_agent'] = agent.user_agent
             modules = db.session().query(Module).filter(Module.agentId == agentID, Module.processed == 1).all()
             if len(modules) != 0:
                 result['modules'] = {}

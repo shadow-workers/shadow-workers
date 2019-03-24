@@ -155,6 +155,8 @@ def updateAgent(agentID, params):
     else:
         agent.last_seen = now
         agent.ip = params['ip']
+        if agent.user_agent !=  params['user_agent']: #update user agent only if it changes
+            agent.user_agent = params['user_agent']
         db.session.commit()
 
 def safeParam(param):
