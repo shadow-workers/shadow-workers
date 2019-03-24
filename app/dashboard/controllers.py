@@ -210,7 +210,7 @@ def activeAgents():
     for agentID in ConnectedAgents:
         if (now - ConnectedAgents[agentID]['last_seen']) > AGENT_TIMEOUT:
             agentsToRemove[agentID] = ConnectedAgents[agentID]
-            ConnectedAgents[agentID]['domActive'] = 'true' if agentID in ConnectedDomAgents else 'false'
+        ConnectedAgents[agentID]['domActive'] = 'true' if agentID in ConnectedDomAgents else 'false'
     for agentID in agentsToRemove:
         del ConnectedAgents[agentID]
 
