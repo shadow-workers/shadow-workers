@@ -72,6 +72,16 @@ function checkAgentShownStatus(){
       // if was dormant and now awake
       showAgent(agentDisplayed.id);
     }
+
+    // Update Dom Status of displayed agent
+    if(agentDisplayed.domActive=='true'){
+      $('#domstatus')[0].innerHTML='Online';
+      $('#domstatus').attr('class','text-success')
+    }else{
+      $('#domstatus')[0].innerHTML='Offline';
+      $('#domstatus').removeClass()
+
+    }
   }
 }
 
@@ -80,6 +90,8 @@ function updateSidebar(){
     response.json().then(function(data){
 	    agents = data.active;
       dormantAgents = data.dormant;
+      if(agentDisplayed!==null && agentDisplayed.id in agents) agentDisplayed=agents[agentDisplayed.id]
+      else if(agentDisplayed!==null && agentDisplayed.id in dormantAgents) agentDisplayed=dormantAgents[agentDisplayed.id]
       updateDisplayStatus();
       $('#agents-sidebar').html('');
       for(var agentID in agents)
@@ -118,10 +130,18 @@ function showAgent(agentID){
         else
           agentHtml += `<p>Offline</p>`;
         agentHtml += `<b>DOM Status:</b>`;
-        if(agent.domActive == 'true')
-          agentHtml += `<p class='text-success'>Online</p>`;
-        else
-          agentHtml += `<p>Offline</p>`;
+
+        //[Start] DOM Status and Terminal Switch
+        agentHtml += `<div class="row">
+        <div class="col-2"><label id='domstatus'>Offline</label></div>
+      
+        <div class="custom-control custom-switch col fetch-left">
+          <input type="checkbox" class="custom-control-input" id="show_dom_shell">
+          <label class="custom-control-label" for="show_dom_shell">DOM JS Shell2</label>
+        </div>
+        </div>
+        `
+        //[End]  DOM Status and Terminal Switch
         agentHtml += `<br/>
         	<b>First Seen:</b>
           ${agent.first_seen} 
@@ -166,14 +186,7 @@ function showAgent(agentID){
             agentHtml += `<hr/>`;
           }
         }
-        //Switch to start Terminal
-        agentHtml += `
-        <div class="custom-control custom-switch">
-          <input type="checkbox" class="custom-control-input" id="show_dom_shell">
-          <label class="custom-control-label" for="show_dom_shell">Start DOM JS Shell</label>
-        </div>
-        `
-        //[End] Switch to start Termina
+
 
         agentHtml += `
         </div>`;        
