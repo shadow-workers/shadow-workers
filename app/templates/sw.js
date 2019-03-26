@@ -1,14 +1,14 @@
 var counter = 0;
 
 function create_UUID() {
-  nouns = ['Air', 'Arm', 'Bow', 'Box', 'Cap', 'Cat', 'Dog', 'Ear', 'Egg', 'Fan', 'Fox', 'Hat', 'Pad', 'Pen', 'Red', 'Tap', 'Tie', 'Bear', 'Belt', 
-  'Bird', 'Book', 'Buds', 'Crow', 'Deer', 'Desk', 'Goat', 'Gown', 'Iron', 'Koel', 'Legs', 'Lips', 'Milk', 'Nose', 'Oven', 'Pipe', 'Rasp', 'Ribs', 
-  'Rice', 'Sari', 'Suit', 'Toes', 'Ankle', 'Apple', 'Apron', 'Beans', 'Black', 'Board', 'Bread', 'Cauli', 'Chest', 'Gauva', 'Hands', 'Lungs', 'Mango',
-  'Mouse', 'Mouth', 'Music', 'Onion', 'Panda', 'Pants', 'Rings', 'Shark', 'Shirt', 'Shoes', 'Stove', 'Table', 'Tiger', 'Track', 'Under', 'Waist',
-  'Whale', 'Wrist', 'drive', 'Boxers', 'Cheese', 'Chilly', 'Donkey', 'Flower', 'Garlic', 'Ginger', 'Grapes', 'Mobile', 'Monkey', 'Orange', 'Parrot',
-  'Pencil', 'Pigeon', 'Plates', 'Player', 'Stairs', 'Balloon', 'Berries', 'Buffalo', 'Fingers', 'Freezer', 'Lighter', 'Ostrich', 'Panther', 'Peacock',
-  'Sandals', 'Sparrow']
-  var uuid = 'x-x-x'.replace(/[xy]/g, function(c) {
+  nouns = ['Air', 'Arm', 'Bow', 'Box', 'Cap', 'Cat', 'Dog', 'Ear', 'Egg', 'Fan', 'Fox', 'Hat', 'Pad', 'Pen', 'Red', 'Tap', 'Tie', 'Bear', 'Belt',
+    'Bird', 'Book', 'Buds', 'Crow', 'Deer', 'Desk', 'Goat', 'Gown', 'Iron', 'Koel', 'Legs', 'Lips', 'Milk', 'Nose', 'Oven', 'Pipe', 'Rasp', 'Ribs',
+    'Rice', 'Sari', 'Suit', 'Toes', 'Ankle', 'Apple', 'Apron', 'Beans', 'Black', 'Board', 'Bread', 'Cauli', 'Chest', 'Gauva', 'Hands', 'Lungs', 'Mango',
+    'Mouse', 'Mouth', 'Music', 'Onion', 'Panda', 'Pants', 'Rings', 'Shark', 'Shirt', 'Shoes', 'Stove', 'Table', 'Tiger', 'Track', 'Under', 'Waist',
+    'Whale', 'Wrist', 'drive', 'Boxers', 'Cheese', 'Chilly', 'Donkey', 'Flower', 'Garlic', 'Ginger', 'Grapes', 'Mobile', 'Monkey', 'Orange', 'Parrot',
+    'Pencil', 'Pigeon', 'Plates', 'Player', 'Stairs', 'Balloon', 'Berries', 'Buffalo', 'Fingers', 'Freezer', 'Lighter', 'Ostrich', 'Panther', 'Peacock',
+    'Sandals', 'Sparrow']
+  var uuid = 'x-x-x'.replace(/[xy]/g, function (c) {
     return nouns[Math.floor(Math.random() * (nouns.length + 1))];
   });
   return uuid;
