@@ -125,8 +125,31 @@ function showAgent(agentID){
         agentDisplayed = agent;
       	agentHtml = `
       	<br/>
-      	<div class="jumbotron" id="agent_info_panel">
-      	  <h3 class="display-4">${agent.id}</h3>
+        <div class="jumbotron" id="agent_info_panel">
+        <div class="row">
+          <div class="col-8">
+            <h3 class="display-4">${agent.id}</h3>
+          </div>
+          <div class="col-4">
+          <button type="button" id="proxy-through-agent" class="btn btn-secondary" data-agent-id="${agent.id}"> <i class="fab fa-hubspot"></i> Proxy through Agent</button> 
+          `
+
+          // [Start] Dropdown button for modules
+          agentHtml += `
+          <button class="btn btn-secondary dropdown-toggle" type="button" id="ExecuteModules" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-rocket"></i> Modules
+          </button>
+          <div class="dropdown-menu" aria-labelledby="ExecuteModules">
+          `
+          for(i = 0; i < modules.length; i++){
+            if(!agent.modules || !(modules[i] in agent.modules))
+            //agentHtml += `<button type="button" data-module='true' data-module-name="${modules[i]}" class="btn btn-secondary" data-agent-id="${agent.id}">Execute ${modules[i]} Module</button> `;
+            agentHtml += `<a class="dropdown-item" href="#" data-module='true'data-module-name="${modules[i]}" data-agent-id="${agent.id}">${modules[i]}</a>`
+          }
+          agentHtml += `</div>`
+          // [End] Dropdown button for modules
+        agentHtml +=`</div>
+        </div>
       	  <br/>
         	<b><i class="fas fa-globe-americas"></i> IP:</b>${agent.ip}</b>
           <br/>
@@ -157,13 +180,6 @@ function showAgent(agentID){
         `
         //[End]  DOM Status and Terminal Switch
 
-        if(agent.active === 'true'){
-        	agentHtml += `<button type="button" id="proxy-through-agent" class="btn btn-secondary" data-agent-id="${agent.id}">Proxy through Agent</button> `;
-        }
-        for(i = 0; i < modules.length; i++){
-          if(!agent.modules || !(modules[i] in agent.modules))
-          agentHtml += `<button type="button" data-module='true' data-module-name="${modules[i]}" class="btn btn-secondary" data-agent-id="${agent.id}">Execute ${modules[i]} Module</button> `;
-        }
         if(agent.push === 'true')
           agentHtml += `<button type="button" class="btn btn-secondary" data-agent-id="${agent.id}" id="trigger-push">Trigger Push Notification</button>`;
         if(agent.modules){
@@ -183,6 +199,24 @@ function showAgent(agentID){
         agentHtml += `
         </div>`;        
         $mainPanel.html(agentHtml);
+
+        // Now that the agentHTML has been attached to dom, lets set the proxy buttons
+        $(function(){
+          if (proxyAgent==agentID){ // Set color of ProxyButton
+            $("button#proxy-through-agent").attr("class", "btn btn-success");
+          }
+          else{
+            $("button#proxy-through-agent").attr("class", "btn btn-secondary");
+          }
+
+          if(agent.active==="true"){ //Enable/disable proxy button
+            $("button#proxy-through-agent").removeAttr("disabled");
+          }
+          else{
+            $("button#proxy-through-agent").attr("disabled","true");
+          }
+
+        })
     });
   });
 }
@@ -319,6 +353,7 @@ $(document).on("click", "button#proxy-through-agent", function(){
 // CLEAR PROXY
 $(document).on("click", "a#clear-proxy", function(){
   if(proxyAgent !== null){
+    proxyAgent = null
   	fetch(proxyUrl() + '/C2_COMMAND?action=clearproxy', {method: 'GET', mode: "no-cors"}).then(function(){
       $("#proxy-status-bar").html('Status: Not Proxying');
       $("button#proxy-through-agent").attr("class", "btn btn-secondary");
