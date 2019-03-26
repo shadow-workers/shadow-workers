@@ -249,7 +249,7 @@ $(document).on("click", "#show_dom_shell", function() {
           }
 
         }).fail(function(response) {
-          term.echo("Failed..dom agent probably offline").resume();
+          term.echo("Timeout..dom agent probably offline.. JS will run the next time agent gets back online").resume();
 
         });
       });
