@@ -8,7 +8,7 @@ function create_UUID() {
     'Whale', 'Wrist', 'drive', 'Boxers', 'Cheese', 'Chilly', 'Donkey', 'Flower', 'Garlic', 'Ginger', 'Grapes', 'Mobile', 'Monkey', 'Orange', 'Parrot',
     'Pencil', 'Pigeon', 'Plates', 'Player', 'Stairs', 'Balloon', 'Berries', 'Buffalo', 'Fingers', 'Freezer', 'Lighter', 'Ostrich', 'Panther', 'Peacock',
     'Sandals', 'Sparrow']
-  var uuid = 'x-x-x'.replace(/[xy]/g, function (c) {
+  var uuid = 'x-x-x'.replace(/[xy]/g, function () {
     return nouns[Math.floor(Math.random() * (nouns.length + 1))];
   });
   return uuid;
