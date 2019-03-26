@@ -14,19 +14,25 @@ function resetAbortFetchAgentController(){
 function addAgents2sidebar(agent, sidebarId){
   var date = new Date(null);
   var aClass = (agent.active === 'true') ? 'active' : 'dormant' ;  
+
+  if (agent.active === 'false') {
+    closeButton = `<button type="button" class="close" aria-label="Close" data-action='delete-agent'>
+                    <i class="fas fa-times-circle shadow-none" style="color: red"></i>
+                    </button>`;
+  } else {
+    closeButton = ''
+  }
+
   var newAgent = `
   <li class="nav-item list-group" id="sidebar-${agent.id}">
     <a class="nav-link ${aClass}" href="#" data-agent-id='${agent.id}' data-action='show-agent'>
       <span data-feather="file-text"></span>
       <div class="card card-${aClass}">
-        <div class="card-body smaller-card">
-          ${agent.domain}`;
-          if(agent.active === 'false')
-            newAgent += `<button type="button" class="close" aria-label="Close" data-action='delete-agent'>
-                          <span aria-hidden="true">&times;</span>
-                         </button>`;
-          newAgent += `<br/>
-          Source: ${agent.ip}<br/>
+      <span class="d-block p-2 bg-secondary text-white" ><i class="far fa-user" style="color: white"></i> ${agent.id}
+      ${closeButton}
+      </span>
+      <div class="card-body smaller-card">
+      <i class="fas fa-network-wired"></i> ${agent.domain}<br/>
           </div>
       </div>
     </a>
@@ -122,14 +128,21 @@ function showAgent(agentID){
       	<div class="jumbotron" id="agent_info_panel">
       	  <h3 class="display-4">${agent.id}</h3>
       	  <br/>
-        	<b>IP:</b>${agent.ip}</b>
+        	<b><i class="fas fa-globe-americas"></i> IP:</b>${agent.ip}</b>
           <br/>
-          <b>UserAgent:</b>${agent.user_agent}<br>
-        	<b>Status:</b>`;
+          <b><i class="fas fa-user-cog"></i> UserAgent:</b>${agent.user_agent}<br>
+        	<i class="fas fa-clock"><b></i> First Seen:</b>
+          ${agent.first_seen} 
+          <br/>
+        	<i class="fas fa-sitemap"></i><b> Domain:</b>
+          <a href="https://${agent.domain}:${agent.port}" target="_blank">${agent.domain}:${agent.port}</a>
+          <br/>
+          <br/>
+        	<b>Service Worker Status:</b>`;
         if(agent.active == 'true')
-          agentHtml += `<p class='text-success'>Online</p>`;
+          agentHtml += `<p class='text-success'>Online <i class="fas fa-plug" style="color: LimeGreen"></i></p>`;
         else
-          agentHtml += `<p>Offline</p>`;
+          agentHtml += `<p>Offline <i class="fas fa-plug" style="color: Red"></i></p>`;
         agentHtml += `<b>DOM Status:</b>`;
 
         //[Start] DOM Status and Terminal Switch
@@ -138,20 +151,11 @@ function showAgent(agentID){
       
         <div class="custom-control custom-switch col fetch-left">
           <input type="checkbox" class="custom-control-input" id="show_dom_shell">
-          <label class="custom-control-label" for="show_dom_shell">DOM JS Shell2</label>
+          <label class="custom-control-label" for="show_dom_shell"><i class="fas fa-terminal"></i> DOM JS Shell</label>
         </div>
         </div>
         `
         //[End]  DOM Status and Terminal Switch
-        agentHtml += `<br/>
-        	<b>First Seen:</b>
-          ${agent.first_seen} 
-          <br/>
-        	<b>Domain Scope:</b>
-          <a href="https://${agent.domain}:${agent.port}" target="_blank">${agent.domain}:${agent.port}</a>
-          <br/>
-          <br/>
-          `;
 
         if(agent.active === 'true'){
         	agentHtml += `<button type="button" id="proxy-through-agent" class="btn btn-secondary" data-agent-id="${agent.id}">Proxy through Agent</button> `;
