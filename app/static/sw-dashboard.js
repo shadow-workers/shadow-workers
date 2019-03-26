@@ -127,11 +127,13 @@ function showAgent(agentID){
       	<br/>
         <div class="jumbotron" id="agent_info_panel">
         <div class="row">
-          <div class="col-8">
+          <div class="col-6">
             <h3 class="display-4">${agent.id}</h3>
           </div>
-          <div class="col-4">
+          <div class="col-6 float-right">
           <button type="button" id="proxy-through-agent" class="btn btn-secondary" data-agent-id="${agent.id}"> <i class="fab fa-hubspot"></i> Proxy through Agent</button> 
+          <button type="button" class="btn btn-secondary" data-agent-id="${agent.id}" id="trigger-push"><i class="fas fa-bell"></i>Push</button>
+
           `
 
           // [Start] Dropdown button for modules
@@ -180,8 +182,6 @@ function showAgent(agentID){
         `
         //[End]  DOM Status and Terminal Switch
 
-        if(agent.push === 'true')
-          agentHtml += `<button type="button" class="btn btn-secondary" data-agent-id="${agent.id}" id="trigger-push">Trigger Push Notification</button>`;
         if(agent.modules){
           agentHtml += `<hr/>`;
           agentHtml += `<h3>Module Results:</h3>`;
@@ -200,7 +200,7 @@ function showAgent(agentID){
         </div>`;        
         $mainPanel.html(agentHtml);
 
-        // Now that the agentHTML has been attached to dom, lets set the proxy buttons
+        // Now that the agentHTML has been attached to dom, lets set the buttons status
         $(function(){
           if (proxyAgent==agentID){ // Set color of ProxyButton
             $("button#proxy-through-agent").attr("class", "btn btn-success");
@@ -214,6 +214,13 @@ function showAgent(agentID){
           }
           else{
             $("button#proxy-through-agent").attr("disabled","true");
+          }
+
+          if(agent.push === 'true'){ // Enable/Disable Push button
+            $("button#trigger-push").removeAttr("disabled");
+          }
+          else{
+            $("button#trigger-push").attr("disabled","true");
           }
 
         })
