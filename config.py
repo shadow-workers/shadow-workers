@@ -12,3 +12,5 @@ class Config(object):
     HOST = os.environ['HOST'] if 'HOST' in os.environ else '127.0.0.1'
     PORT = os.environ['PORT'] if 'PORT' in os.environ else 5000
     HTTPS = True if 'HTTPS' in os.environ else False
+    SSL_CERT = os.environ['CERT'] if 'CERT' in os.environ else 'cert.pem'
+    SSL_KEY = os.environ['KEY'] if 'KEY' in os.environ else 'key.pem'
