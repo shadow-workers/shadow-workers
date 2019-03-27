@@ -49,10 +49,13 @@ function getModules(){
       for(i = 0; i < modules.length; i++){
         var autoLoaded = autoLoadedModules.indexOf(modules[i]) >= 0;
         var modulesHTML = `<hr/><img src="/static/images/tick.png"`;
-        if(!autoLoaded)
-          modulesHTML += ` class="hidden"`;
-        modulesHTML += `/> <a href='#' data-action='auto-load-module' data-loaded='${autoLoaded}' data-module-name='${modules[i]}'>${modules[i]}</a>`;
-        $('div#auto-load-modules').append(modulesHTML);
+        var modulesHTML = ` 
+        <div class="custom-control custom-switch col fetch-left" > 
+        <input id="${modules[i]}" type="checkbox" ${autoLoaded?'checked':''} class="custom-control-input" data-action='auto-load-module' data-loaded='${autoLoaded}' data-module-name='${modules[i]}' >
+        <label class="custom-control-label text-light" for="${modules[i]}"> ${modules[i]}</label>
+        </div>
+        `
+        $('div#automodules_settings').append(modulesHTML);
       }
     });
   });
@@ -299,7 +302,7 @@ $(document).on("click", "[data-action='delete-module']", function(){
 });
 
 // AUTO LOAD MODULE ON NEW AGENT
-$(document).on("click", "a[data-action='auto-load-module']", function(){
+$(document).on("click", "input[data-action='auto-load-module']", function(){
   var $btn = $(this);
   $btn.hide();
   var wasLoaded = $btn.data('loaded') === true;
@@ -420,3 +423,20 @@ $(document).ready(function(){
   });
 });
 
+// [Start] Settings overlay
+function openSettings() {
+  document.getElementById("SettingsOverlay").style.height = "100%";
+}
+
+function closeSettings() {
+  document.getElementById("SettingsOverlay").style.height = "0%";
+}
+
+$(document).on("click", "#btnSettingsClose", function(){
+  closeSettings()
+});
+
+$(document).on("click", "#btnSettingsOpen", function(){
+  openSettings()
+});
+// [End] Settings overlay

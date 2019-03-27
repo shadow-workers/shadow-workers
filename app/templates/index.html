@@ -10,14 +10,33 @@
     <link href="{{ url_for('static', filename='dashboard.css')}}" rel="stylesheet">
   </head>
   <body>
-    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">SW-Proxy</a>
-      <medium class="text-muted" id="proxy-status-bar">Status: Not Proxying</medium>
-      <ul class="navbar-nav px-3">
+    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow navbar-expand-lg">
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Shadow Workers</a>
+
+    <medium class="text-muted col-8 text-center" id="proxy-status-bar">Status: Not Proxying<br></medium>
+      <div class="navbar-collapse collapse w-100 order-3 dual-collapse">
+        <ul class="navbar-nav ml-auto">
         <li class="nav-item text-nowrap">
-          <a class="nav-link" href="#" id="clear-proxy">Clear Proxy</a>
+          <a class="nav-link h5" href="#" id="clear-proxy"> <i class="fas fa-unlink"></i> Clear Proxy</a>
+        </li>
+        <li class="divider-vertical"></li>
+        <li class="nav-item text-nowrap">
+          <a class="nav-link" href="#" id="btnSettingsOpen"><i class="fas fa-cogs fa-2x"></i></a>
         </li>
       </ul>
+    </div>
+    <div id="SettingsOverlay" class="overlay">
+      <!--<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>-->
+      <a href="#" id="btnSettingsClose" class="closebtn" ">&times;</a>
+      <img src="{{ url_for('static', filename='images/shadow-black.png')}}" class="img-fluid mx-auto d-block" height="400" width="400"></img>
+      <div class=" overlay-content" id="automodules_settings">
+          <a href="#">Autoload Modules</a>
+          <hr width="20%" style="border-color: red;">
+        </div>
+
+    
+    </div>
+    </div>
     </nav>
     <div class="container-fluid">
       <div class="row">
@@ -50,9 +69,6 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-sm" id="auto-load-modules">
-              <h4>Auto Load Modules On New Agents</h4>
-            </div>
             <div class="col-sm">
               <a href="#" class="nav-link" id="generate-sw">Generate SW</a>
               <textarea id="sw-result"></textarea>
@@ -61,6 +77,9 @@
         </div>
       </div>
     </div>
+
+
+
     <script src="{{ url_for('static', filename='jquery-3.3.1.js')}}"></script>
     <script src="{{ url_for('static', filename='popper.js')}}"></script>
     <script src="{{ url_for('static', filename='bootstrap-toggle/bootstrap-toggle.min.js')}}"></script>
