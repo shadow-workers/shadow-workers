@@ -12,9 +12,12 @@ dashboard = Blueprint('dashboard', __name__)
 AGENT_TIMEOUT = 8
 
 @dashboard.after_request
-def apply_csp(response):
+def applySecurityHeaders(response):
     #style-src 'self'; 
     response.headers["Content-Security-Policy"] = "script-src 'self'; img-src 'self'; font-src 'self'; media-src 'self'; frame-src 'self'; frame-ancestors 'none'"
+    response.headers["X-Frame-Options"] = "deny"
+    response.headers["X-Xss-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "same-origin"
     return response
 
 @dashboard.route('/')
