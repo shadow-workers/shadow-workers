@@ -17,6 +17,12 @@ def apply_csp(response):
     response.headers["Content-Security-Policy"] = "script-src 'self'; img-src 'self'; font-src 'self'; media-src 'self'; frame-src 'self'; frame-ancestors 'none'"
     return response
 
+@dashboard.before_request
+def contentTypeCSRFProtection():
+    if request.method == 'POST':
+        if not request.content_type == 'application/json':
+            return Response("", 404)    
+
 @dashboard.route('/')
 @auth.login_required
 def servedashboard():
