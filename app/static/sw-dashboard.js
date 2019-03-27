@@ -273,7 +273,12 @@ $(document).on("click", "#show_dom_shell", function() {
 // LOAD MODULE AGAINST AGENT
 $(document).on("click", "[data-module='true']", function(){
   var $btn = $(this);
-  fetch(dashUrl() + `/module/${$btn.data('module-name')}/${$btn.data('agent-id')}`, {method: 'POST'}).then(function(res){
+  fetch(dashUrl() + `/module/${$btn.data('module-name')}/${$btn.data('agent-id')}`, 
+    {
+      method: 'POST',
+      headers: new Headers({'content-type': 'application/json'})
+    }
+  ).then(function(res){
     if(!res.ok){
       $btn.attr("class", "btn btn-danger");
     }
@@ -299,7 +304,12 @@ $(document).on("click", "a[data-action='auto-load-module']", function(){
   $btn.hide();
   var wasLoaded = $btn.data('loaded') === true;
   var method = wasLoaded ? 'DELETE' : 'POST';
-  fetch(dashUrl() + `/automodule/${$btn.data('module-name')}`, {method: method}).then(function(){
+  fetch(dashUrl() + `/automodule/${$btn.data('module-name')}`, 
+    {
+      method: method,
+      headers: new Headers({'content-type': 'application/json'})
+    }
+  ).then(function(){
     if(wasLoaded){
       $btn.prev().hide();
       $btn.data('loaded', false);
@@ -334,7 +344,12 @@ $(document).on("click", "button[data-action='delete-agent']", function(event){
 // TRIGGER PUSH
 $(document).on("click", "button#trigger-push", function(){
   var $btn = $(this);
-  fetch(dashUrl() + `/push/${$(this).data('agent-id')}`, {method: 'POST'}).then(function(res){
+  fetch(dashUrl() + `/push/${$(this).data('agent-id')}`, 
+    {
+      method: 'POST',
+      headers: new Headers({'content-type': 'application/json'})
+    }
+  ).then(function(res){
     if(!res.ok){
       $btn.attr("class", "btn btn-danger");
     }
