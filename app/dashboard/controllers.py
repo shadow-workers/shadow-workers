@@ -20,6 +20,12 @@ def applySecurityHeaders(response):
     response.headers["Referrer-Policy"] = "same-origin"
     return response
 
+@dashboard.before_request
+def contentTypeCSRFProtection():
+    if request.method == 'POST':
+        if not request.content_type == 'application/json':
+            return Response("", 404)    
+
 @dashboard.route('/')
 @auth.login_required
 def servedashboard():
