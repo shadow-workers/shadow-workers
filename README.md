@@ -1,4 +1,4 @@
-# Shadow Workers: XSS & SW exploitation framework
+# Shadow Workers
 
 ## Info
 Shadow Workers is a free and open source C2 and proxy designed for penetration testers to help in the exploitation of XSS and malicious Service Workers (SW).
