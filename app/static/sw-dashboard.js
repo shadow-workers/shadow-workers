@@ -386,14 +386,16 @@ $(document).on("click", "a#clear-proxy", function(){
   }
 });
 
-$(document).on("click", "a#generate-sw", function(){
-  fetch(c2Url() + `/modules/sw.js`).then(function(res){
-    if(res.ok){
-      res.text().then(function(res){
-        $('textarea#sw-result').text(res).show();
-      });
-    }
-  });
+//Generate SW.JS
+$(document).on("click", "#genSW", function(){
+  window.open("/modules/sw.js");
+
+});
+
+//Generate XSS.JS
+$(document).on("click", "#genXSS", function(){
+  window.open("/modules/xss");
+
 });
 
 $(document).on("click", "textarea#sw-result", function(){
