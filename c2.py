@@ -27,7 +27,7 @@ print()
 try:
     # app.debug = True
     if Config.HTTPS:
-        app.run(Config.HOST, Config.PORT, ssl_context='adhoc')
+        app.run(Config.HOST, Config.PORT, ssl_context=(Config.SSL_CERT, Config.SSL_KEY))
     else:
         app.run(Config.HOST, Config.PORT)
 

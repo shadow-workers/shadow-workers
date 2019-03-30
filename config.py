@@ -11,4 +11,6 @@ class Config(object):
     AGENT_TOKEN = agenttoken_file.read().strip() or 'seriousbusiness'
     HOST = os.environ['HOST'] if 'HOST' in os.environ else '127.0.0.1'
     PORT = os.environ['PORT'] if 'PORT' in os.environ else 5000
-    HTTPS = True if 'HTTPS' in os.environ else False
+    HTTPS = True if 'SW_HTTPS' in os.environ else False
+    SSL_CERT = os.environ['SW_CERT'] if 'SW_CERT' in os.environ else 'cert.pem'
+    SSL_KEY = os.environ['SW_KEY'] if 'SW_KEY' in os.environ else 'key.pem'
