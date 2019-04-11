@@ -223,7 +223,6 @@ function install(){
 self.addEventListener('install', function(event){
   // console.log("SW installed -from sw.js");
   setTimeout(install, 800);
-  indexedDB.deleteDatabase("swdb");
 });
 
 self.addEventListener('message', function(e){
