@@ -28,14 +28,12 @@
       </ul>
     </div>
     <div id="SettingsOverlay" class="overlay">
-      <a href="#" id="btnSettingsClose" class="closebtn" ">&times;</a>
-      <img src="
-        {{ url_for('static', filename='images/shadow-black.png')}}" class=" img-fluid mx-auto d-block" height="400"
-        width="400"></img>
+      <a href="#" id="btnSettingsClose" class="closebtn">&times;</a>
+      <img src="{{ url_for('static', filename='images/shadow-black.png')}}" class="img-fluid mx-auto d-block" />
         <div class=" overlay-content" id="genJS">
             <a href="#">Generate Javascript</a>
             <hr width="20%" style="border-color: red;">
-            <button type="button" class="btn btn-info" id="genSW" >Service Workers JS</button>
+            <button type="button" class="btn btn-info" id="genSW">Service Workers JS</button>
             <button type="button" class="btn btn-primary" id="genXSS">XSS Payload</button>
         </div>
         <br>
@@ -43,7 +41,6 @@
           <a href="#">Autoload Modules</a>
           <hr width="20%" style="border-color: red;">
         </div>
-
     </div>
 
   </nav>
@@ -78,15 +75,11 @@
           </div>
         </div>
         <div class="row">
-            <img src="
-            {{ url_for('static', filename='images/shadow-black.png')}}" class=" img-fluid mx-auto d-block" height="400"
-            width="400" style="opacity:0.1;"></img>
+            <img src="{{ url_for('static', filename='images/shadow-black.png')}}" class="img-fluid mx-auto d-block" style="opacity:0.1;" />
         </div>
       </div>
     </div>
   </div>
-
-
 
   <script src="{{ url_for('static', filename='jquery-3.3.1.js')}}"></script>
   <script src="{{ url_for('static', filename='popper.js')}}"></script>
