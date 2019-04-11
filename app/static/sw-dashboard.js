@@ -426,19 +426,23 @@ $(document).ready(function(){
 });
 
 // [Start] Settings overlay
-function openSettings() {
-  document.getElementById("SettingsOverlay").style.height = "100%";
+function openSettings(){
+  $("#settingsOverlay").css("height", "100%");
 }
 
-function closeSettings() {
-  document.getElementById("SettingsOverlay").style.height = "0%";
+function closeSettings(){
+  $("#settingsOverlay").css("height", "0%");
 }
 
-$(document).on("click", "#btnSettingsClose", function(){
+$(document).on("click", "#settingsOverlay button, #settingsOverlay input, #settingsOverlay label", function(e){
+  e.stopPropagation();
+});
+
+$(document).on("click", "#settingsOverlay", function(){
   closeSettings()
 });
 
-$(document).on("click", "#btnSettingsOpen", function(){
+$(document).on("click", "[data-overlay='open']", function(){
   openSettings()
 });
 // [End] Settings overlay

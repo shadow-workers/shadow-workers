@@ -23,11 +23,11 @@
         </li>
         <li class="divider-vertical"></li>
         <li class="nav-item text-nowrap">
-          <a class="nav-link" href="#" id="btnSettingsOpen"><i class="fas fa-cogs fa-2x"></i></a>
+          <a class="nav-link" href="#" data-overlay="open"><i class="fas fa-cogs fa-2x"></i></a>
         </li>
       </ul>
     </div>
-    <div id="SettingsOverlay" class="overlay">
+    <div id="settingsOverlay" class="overlay">
       <a href="#" id="btnSettingsClose" class="closebtn">&times;</a>
       <img src="{{ url_for('static', filename='images/shadow-black.png')}}" class="img-fluid mx-auto d-block" />
         <div class=" overlay-content" id="genJS">
@@ -72,6 +72,9 @@
         <div class="row">
           <div class="col-md-12 ml-sm-auto col-lg-12 px-4" id="agents-main">
             <center class="main-center">Wait for agents to appear, then click them for details</center>
+            <center>
+              <p data-overlay="open">Open settings <i class="fas fa-cogs fa-2x"></i></p>
+            </center>
           </div>
         </div>
         <div class="row">
