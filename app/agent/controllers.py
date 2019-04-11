@@ -22,7 +22,7 @@ def verify_token():
 @agent.after_request
 def apply_cors(response):
     response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Headers"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type,User-Agent"
     return response
 
 @agent.route('/get')
