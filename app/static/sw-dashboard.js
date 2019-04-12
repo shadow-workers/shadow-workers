@@ -203,17 +203,19 @@ function showAgent(agentID){
         agentHtml += `
         </div>`;        
         $mainPanel.html(agentHtml);
+        $('#initial-main').hide();
+        $mainPanel.show();
 
         // Now that the agentHTML has been attached to dom, lets set the buttons status
         $(function(){
-          if (proxyAgent==agentID){ // Set color of ProxyButton
+          if (proxyAgent == agentID){ // Set color of ProxyButton
             $("button#proxy-through-agent").attr("class", "btn btn-success");
           }
           else{
             $("button#proxy-through-agent").attr("class", "btn btn-secondary");
           }
 
-          if(agent.active==="true"){ //Enable/disable proxy button
+          if(agent.active === "true"){ //Enable/disable proxy button
             $("button#proxy-through-agent").removeAttr("disabled");
           }
           else{
@@ -339,6 +341,11 @@ $(document).on("click", "button[data-action='delete-agent']", function(event){
   $btn.hide();
   fetch(dashUrl() + `/agent/${agentID}`, {method: 'DELETE'}).then(function(res){
     if(res.ok){
+      if(agentID == agentDisplayed.id){
+        agentDisplayed = null;
+        $('#agents-main').hide();
+        $('#initial-main').show();
+      }
       $(`li#sidebar-${agent.id}`).remove();
     }
   });

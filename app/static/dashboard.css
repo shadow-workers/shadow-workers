@@ -93,6 +93,10 @@ div.smaller-card {
  * Navbar
  */
 
+#agents-main {
+  display: none
+}
+
 .navbar-brand {
   padding-top: .75rem;
   padding-bottom: .75rem;
