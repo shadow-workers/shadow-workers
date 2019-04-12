@@ -157,9 +157,9 @@ function showAgent(agentID){
         agentHtml +=`</div>
         </div>
       	  <br/>
-        	<b><i class="fas fa-globe-americas"></i> IP:</b>${agent.ip}</b>
+        	<b><i class="fas fa-globe-americas"></i> IP: </b>${agent.ip}</b>
           <br/>
-          <b><i class="fas fa-user-cog"></i> UserAgent:</b>${agent.user_agent}<br>
+          <b><i class="fas fa-user-cog"></i> UserAgent: </b>${agent.user_agent}<br>
         	<i class="fas fa-clock"><b></i> First Seen:</b>
           ${agent.first_seen} 
           <br/>
@@ -177,7 +177,6 @@ function showAgent(agentID){
         //[Start] DOM Status and Terminal Switch
         agentHtml += `<div class="row">
         <div class="col-2"><label id='domstatus'>Offline</label></div>
-      
         <div class="custom-control custom-switch col fetch-left">
           <input type="checkbox" class="custom-control-input" id="show_dom_shell">
           <label class="custom-control-label" for="show_dom_shell"><i class="fas fa-terminal"></i> DOM JS Shell</label>
@@ -199,7 +198,6 @@ function showAgent(agentID){
           }
         }
 
-
         agentHtml += `
         </div>`;        
         $mainPanel.html(agentHtml);
@@ -214,14 +212,12 @@ function showAgent(agentID){
           else{
             $("button#proxy-through-agent").attr("class", "btn btn-secondary");
           }
-
           if(agent.active === "true"){ //Enable/disable proxy button
             $("button#proxy-through-agent").removeAttr("disabled");
           }
           else{
             $("button#proxy-through-agent").attr("disabled","true");
           }
-
           if(agent.push === 'true'){ // Enable/Disable Push button
             $("button#trigger-push").removeAttr("disabled");
           }
@@ -260,21 +256,15 @@ $(document).on("click", "#show_dom_shell", function() {
           } else {
             term.echo("timeout").resume();
           }
-
         }).fail(function(response) {
           term.echo("Timeout..dom agent probably offline.. JS will run the next time agent gets back online").resume();
-
         });
       });
     });
-
-
   } else if (!$('input#show_dom_shell').is(":checked") && $('#terminal').length != 0) {
-    $('#terminal').remove()
+    $('#terminal').remove();
   }
-
 });
-
 
 // LOAD MODULE AGAINST AGENT
 $(document).on("click", "[data-module='true']", function(){
@@ -330,7 +320,6 @@ $(document).on("click", "input[data-action='auto-load-module']", function(){
 // LOAD AGENT DETAILS
 $(document).on("click", "a[data-action='show-agent']", function(){
 	showAgent($(this).data('agent-id'));
-
 });
 
 // DELETE AGENT
@@ -397,18 +386,11 @@ $(document).on("click", "a#clear-proxy", function(){
 //Generate SW.JS
 $(document).on("click", "#genSW", function(){
   window.open("/modules/sw.js");
-
 });
 
 //Generate XSS.JS
 $(document).on("click", "#genXSS", function(){
   window.open("/modules/xss");
-
-});
-
-$(document).on("click", "textarea#sw-result", function(){
-  this.select();
-  document.execCommand("copy");
 });
 
 function proxyUrl(){
@@ -447,10 +429,10 @@ $(document).on("click", "#settingsOverlay button, #settingsOverlay input, #setti
 });
 
 $(document).on("click", "#settingsOverlay", function(){
-  closeSettings()
+  closeSettings();
 });
 
 $(document).on("click", "[data-overlay='open']", function(){
-  openSettings()
+  openSettings();
 });
 // [End] Settings overlay

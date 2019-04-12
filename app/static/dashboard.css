@@ -89,13 +89,14 @@ div.smaller-card {
   padding-top: 48px; /* Space for fixed navbar */
 }
 
+#agents-main {
+  display: none;
+  font-size: 1.22em;
+}
+
 /*
  * Navbar
  */
-
-#agents-main {
-  display: none
-}
 
 .navbar-brand {
   padding-top: .75rem;
@@ -205,4 +206,3 @@ body {
   }
 }
 /* [End] OverLay]
-
