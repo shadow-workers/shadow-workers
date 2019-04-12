@@ -83,11 +83,11 @@ function checkAgentShownStatus(){
     }
 
     // Update Dom Status of displayed agent
-    if(agentDisplayed.domActive=='true'){
-      $('#domstatus')[0].innerHTML='Online';
+    if(agentDisplayed.domActive == 'true'){
+      $('#domstatus').text('Online');
       $('#domstatus').attr('class','text-success')
     }else{
-      $('#domstatus')[0].innerHTML='Offline';
+      $('#domstatus').text('Offline');
       $('#domstatus').removeClass()
 
     }
@@ -99,9 +99,11 @@ function updateSidebar(){
     response.json().then(function(data){
 	    agents = data.active;
       dormantAgents = data.dormant;
-      if(agentDisplayed!==null && agentDisplayed.id in agents) agentDisplayed=agents[agentDisplayed.id]
-      else if(agentDisplayed!==null && agentDisplayed.id in dormantAgents) agentDisplayed=dormantAgents[agentDisplayed.id]
       updateDisplayStatus();
+      if(agentDisplayed !== null && agentDisplayed.id in agents) 
+        agentDisplayed = agents[agentDisplayed.id];
+      else if(agentDisplayed !== null && agentDisplayed.id in dormantAgents) 
+        agentDisplayed = dormantAgents[agentDisplayed.id];
       $('#agents-sidebar').html('');
       for(var agentID in agents)
   	    addAgents2sidebar(agents[agentID], '#agents-sidebar');
@@ -114,7 +116,6 @@ function updateSidebar(){
 
 // SHOW AGENT
 function showAgent(agentID){
-  window.current_agentID=agentID
   if(queuefetchAgentRequests.length !== 0){
     fetchAgentAbortcontroller.abort();
     resetAbortFetchAgentController();
@@ -244,7 +245,7 @@ $(document).on("click", "#show_dom_shell", function() {
         $.ajax({
           type: "POST",
           contentType: "application/json",
-          url: 'dom/' + window.current_agentID,
+          url: 'dom/' + agentDisplayed.id,
           data: JSON.stringify({
             js: command
           }),
