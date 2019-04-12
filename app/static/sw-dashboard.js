@@ -236,29 +236,27 @@ $(document).on("click", "#show_dom_shell", function() {
     $('#agent_info_panel').append($('<div>', {
       class: 'terminal',
       id: 'terminal'
-    }));
-    $(document).ready(function() {
-      term = $('#terminal').terminal(function(command, term) {
-        term.pause();
-        $.ajax({
-          type: "POST",
-          contentType: "application/json",
-          url: 'dom/' + agentDisplayed.id,
-          data: JSON.stringify({
-            js: command
-          }),
-          dataType: "json"
-        }).done(function(response) {
-          if (('result' in response) && response['result'] != null) {
-            term.echo(response['result']).resume();
-          } else if (('result' in response) && response['result'] == null) {
-            term.echo("Null").resume();
-          } else {
-            term.echo("timeout").resume();
-          }
-        }).fail(function(response) {
-          term.echo("Timeout..dom agent probably offline.. JS will run the next time agent gets back online").resume();
-        });
+    }));  
+    term = $('#terminal').terminal(function(command, term) {
+      term.pause();
+      $.ajax({
+        type: "POST",
+        contentType: "application/json",
+        url: 'dom/' + agentDisplayed.id,
+        data: JSON.stringify({
+          js: command
+        }),
+        dataType: "json"
+      }).done(function(response) {
+        if (('result' in response) && response['result'] != null) {
+          term.echo(response['result']).resume();
+        } else if (('result' in response) && response['result'] == null) {
+          term.echo("Null").resume();
+        } else {
+          term.echo("timeout").resume();
+        }
+      }).fail(function(response) {
+        term.echo("Timeout..dom agent probably offline.. JS will run the next time agent gets back online").resume();
       });
     });
   } else if (!$('input#show_dom_shell').is(":checked") && $('#terminal').length != 0) {
