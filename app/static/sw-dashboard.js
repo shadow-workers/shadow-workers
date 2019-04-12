@@ -333,11 +333,10 @@ $(document).on("click", "button[data-action='delete-agent']", function(event){
         $('#agents-main').hide();
         $('#initial-main').show();
       }
-      $(`li#sidebar-${agent.id}`).remove();
+      $(`li#sidebar-${agentID}`).remove();
     }
   });
 });
-
 
 // TRIGGER PUSH
 $(document).on("click", "button#trigger-push", function(){
