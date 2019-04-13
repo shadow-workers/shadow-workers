@@ -8,7 +8,7 @@ function create_UUID() {
     'Whale', 'Wrist', 'drive', 'Boxers', 'Cheese', 'Chilly', 'Donkey', 'Flower', 'Garlic', 'Ginger', 'Grapes', 'Mobile', 'Monkey', 'Orange', 'Parrot',
     'Pencil', 'Pigeon', 'Plates', 'Player', 'Stairs', 'Balloon', 'Berries', 'Buffalo', 'Fingers', 'Freezer', 'Lighter', 'Ostrich', 'Panther', 'Peacock',
     'Sandals', 'Sparrow']
-  var uuid = 'x-x-x'.replace(/[xy]/g, function () {
+  var uuid = 'x-x-x'.replace(/[xy]/g, function(){
     return nouns[Math.floor(Math.random() * (nouns.length + 1))];
   });
   return uuid;
@@ -175,7 +175,8 @@ function urlB64ToUint8Array(base64String){
 function postPushReg(sub){
   if(agentID === null){
     setTimeout(function(){
-      postPushReg(sub)
+      init();
+      postPushReg(sub);
     }, 100);
     return;
   }
