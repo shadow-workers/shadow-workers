@@ -83,11 +83,11 @@ function checkAgentShownStatus(){
     }
 
     // Update Dom Status of displayed agent
-    if(agentDisplayed.domActive=='true'){
-      $('#domstatus')[0].innerHTML='Online';
+    if(agentDisplayed.domActive == 'true'){
+      $('#domstatus').text('Online');
       $('#domstatus').attr('class','text-success')
     }else{
-      $('#domstatus')[0].innerHTML='Offline';
+      $('#domstatus').text('Offline');
       $('#domstatus').removeClass()
 
     }
@@ -99,9 +99,11 @@ function updateSidebar(){
     response.json().then(function(data){
 	    agents = data.active;
       dormantAgents = data.dormant;
-      if(agentDisplayed!==null && agentDisplayed.id in agents) agentDisplayed=agents[agentDisplayed.id]
-      else if(agentDisplayed!==null && agentDisplayed.id in dormantAgents) agentDisplayed=dormantAgents[agentDisplayed.id]
       updateDisplayStatus();
+      if(agentDisplayed !== null && agentDisplayed.id in agents) 
+        agentDisplayed = agents[agentDisplayed.id];
+      else if(agentDisplayed !== null && agentDisplayed.id in dormantAgents) 
+        agentDisplayed = dormantAgents[agentDisplayed.id];
       $('#agents-sidebar').html('');
       for(var agentID in agents)
   	    addAgents2sidebar(agents[agentID], '#agents-sidebar');
@@ -114,7 +116,6 @@ function updateSidebar(){
 
 // SHOW AGENT
 function showAgent(agentID){
-  window.current_agentID=agentID
   if(queuefetchAgentRequests.length !== 0){
     fetchAgentAbortcontroller.abort();
     resetAbortFetchAgentController();
@@ -156,9 +157,9 @@ function showAgent(agentID){
         agentHtml +=`</div>
         </div>
       	  <br/>
-        	<b><i class="fas fa-globe-americas"></i> IP:</b>${agent.ip}</b>
+        	<b><i class="fas fa-globe-americas"></i> IP: </b>${agent.ip}</b>
           <br/>
-          <b><i class="fas fa-user-cog"></i> UserAgent:</b>${agent.user_agent}<br>
+          <b><i class="fas fa-user-cog"></i> UserAgent: </b>${agent.user_agent}<br>
         	<i class="fas fa-clock"><b></i> First Seen:</b>
           ${agent.first_seen} 
           <br/>
@@ -176,7 +177,6 @@ function showAgent(agentID){
         //[Start] DOM Status and Terminal Switch
         agentHtml += `<div class="row">
         <div class="col-2"><label id='domstatus'>Offline</label></div>
-      
         <div class="custom-control custom-switch col fetch-left">
           <input type="checkbox" class="custom-control-input" id="show_dom_shell">
           <label class="custom-control-label" for="show_dom_shell"><i class="fas fa-terminal"></i> DOM JS Shell</label>
@@ -198,27 +198,26 @@ function showAgent(agentID){
           }
         }
 
-
         agentHtml += `
         </div>`;        
         $mainPanel.html(agentHtml);
+        $('#initial-main').hide();
+        $mainPanel.show();
 
         // Now that the agentHTML has been attached to dom, lets set the buttons status
         $(function(){
-          if (proxyAgent==agentID){ // Set color of ProxyButton
+          if (proxyAgent == agentID){ // Set color of ProxyButton
             $("button#proxy-through-agent").attr("class", "btn btn-success");
           }
           else{
             $("button#proxy-through-agent").attr("class", "btn btn-secondary");
           }
-
-          if(agent.active==="true"){ //Enable/disable proxy button
+          if(agent.active === "true"){ //Enable/disable proxy button
             $("button#proxy-through-agent").removeAttr("disabled");
           }
           else{
             $("button#proxy-through-agent").attr("disabled","true");
           }
-
           if(agent.push === 'true'){ // Enable/Disable Push button
             $("button#trigger-push").removeAttr("disabled");
           }
@@ -237,41 +236,33 @@ $(document).on("click", "#show_dom_shell", function() {
     $('#agent_info_panel').append($('<div>', {
       class: 'terminal',
       id: 'terminal'
-    }));
-    $(document).ready(function() {
-      term = $('#terminal').terminal(function(command, term) {
-        term.pause();
-        $.ajax({
-          type: "POST",
-          contentType: "application/json",
-          url: 'dom/' + window.current_agentID,
-          data: JSON.stringify({
-            js: command
-          }),
-          dataType: "json"
-        }).done(function(response) {
-          if (('result' in response) && response['result'] != null) {
-            term.echo(response['result']).resume();
-          } else if (('result' in response) && response['result'] == null) {
-            term.echo("Null").resume();
-          } else {
-            term.echo("timeout").resume();
-          }
-
-        }).fail(function(response) {
-          term.echo("Timeout..dom agent probably offline.. JS will run the next time agent gets back online").resume();
-
-        });
+    }));  
+    term = $('#terminal').terminal(function(command, term) {
+      term.pause();
+      $.ajax({
+        type: "POST",
+        contentType: "application/json",
+        url: 'dom/' + agentDisplayed.id,
+        data: JSON.stringify({
+          js: command
+        }),
+        dataType: "json"
+      }).done(function(response) {
+        if (('result' in response) && response['result'] != null) {
+          term.echo(response['result']).resume();
+        } else if (('result' in response) && response['result'] == null) {
+          term.echo("Null").resume();
+        } else {
+          term.echo("timeout").resume();
+        }
+      }).fail(function(response) {
+        term.echo("Timeout..dom agent probably offline.. JS will run the next time agent gets back online").resume();
       });
     });
-
-
   } else if (!$('input#show_dom_shell').is(":checked") && $('#terminal').length != 0) {
-    $('#terminal').remove()
+    $('#terminal').remove();
   }
-
 });
-
 
 // LOAD MODULE AGAINST AGENT
 $(document).on("click", "[data-module='true']", function(){
@@ -327,7 +318,6 @@ $(document).on("click", "input[data-action='auto-load-module']", function(){
 // LOAD AGENT DETAILS
 $(document).on("click", "a[data-action='show-agent']", function(){
 	showAgent($(this).data('agent-id'));
-
 });
 
 // DELETE AGENT
@@ -338,11 +328,15 @@ $(document).on("click", "button[data-action='delete-agent']", function(event){
   $btn.hide();
   fetch(dashUrl() + `/agent/${agentID}`, {method: 'DELETE'}).then(function(res){
     if(res.ok){
-      $(`li#sidebar-${agent.id}`).remove();
+      if(agentID == agentDisplayed.id){
+        agentDisplayed = null;
+        $('#agents-main').hide();
+        $('#initial-main').show();
+      }
+      $(`li#sidebar-${agentID}`).remove();
     }
   });
 });
-
 
 // TRIGGER PUSH
 $(document).on("click", "button#trigger-push", function(){
@@ -389,18 +383,11 @@ $(document).on("click", "a#clear-proxy", function(){
 //Generate SW.JS
 $(document).on("click", "#genSW", function(){
   window.open("/modules/sw.js");
-
 });
 
 //Generate XSS.JS
 $(document).on("click", "#genXSS", function(){
   window.open("/modules/xss");
-
-});
-
-$(document).on("click", "textarea#sw-result", function(){
-  this.select();
-  document.execCommand("copy");
 });
 
 function proxyUrl(){
@@ -426,19 +413,23 @@ $(document).ready(function(){
 });
 
 // [Start] Settings overlay
-function openSettings() {
-  document.getElementById("SettingsOverlay").style.height = "100%";
+function openSettings(){
+  $("#settingsOverlay").css("height", "100%");
 }
 
-function closeSettings() {
-  document.getElementById("SettingsOverlay").style.height = "0%";
+function closeSettings(){
+  $("#settingsOverlay").css("height", "0%");
 }
 
-$(document).on("click", "#btnSettingsClose", function(){
-  closeSettings()
+$(document).on("click", "#settingsOverlay button, #settingsOverlay input, #settingsOverlay label", function(e){
+  e.stopPropagation();
 });
 
-$(document).on("click", "#btnSettingsOpen", function(){
-  openSettings()
+$(document).on("click", "#settingsOverlay", function(){
+  closeSettings();
+});
+
+$(document).on("click", "[data-overlay='open']", function(){
+  openSettings();
 });
 // [End] Settings overlay
