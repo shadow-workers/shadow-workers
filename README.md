@@ -6,6 +6,10 @@ A successful exploitation allows you to browse on the targeted application as th
 
 [Shadow Workers Site](https://shadow-workers.github.io)
 
+## Authors
+* [@libnex](https://twitter.com/libnex)
+* [@claudiocontin](https://twitter.com/claudiocontin)
+
 ## License
 
 This tool is released under the [MIT License](https://opensource.org/licenses/MIT).
