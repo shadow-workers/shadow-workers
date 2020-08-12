@@ -1,6 +1,9 @@
 # Shadow Workers
 
-[![Foo](http://rawcdn.githack.com/toolswatch/badges/master/arsenal/usa/2019.svg)](https://www.blackhat.com/us-19/arsenal/schedule/index.html#ghost-in-the-browser-backdooring-with-shadow-workers-16989)
+[![Foo](https://rawcdn.githack.com/toolswatch/badges/master/arsenal/usa/2019.svg)](https://www.blackhat.com/us-19/arsenal/schedule/index.html#ghost-in-the-browser-backdooring-with-shadow-workers-16989)
+
+[![Foo](https://rawcdn.githack.com/toolswatch/badges/master/arsenal/asia/2019.svg)](https://www.blackhat.com/asia-19/arsenal/schedule/index.html#ghosts-in-the-browser-backdooring-with-service-workers-14380)
+
 
 ## Info
 Shadow Workers is a free and open source C2 and proxy designed for penetration testers to help in the exploitation of XSS and malicious Service Workers (SW).
