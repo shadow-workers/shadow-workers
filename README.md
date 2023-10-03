@@ -12,6 +12,11 @@ A successful exploitation allows you to browse on the targeted application as th
 ## How to use
 [Shadow Workers Site](https://shadow-workers.github.io)
 
+TrustedSec Blog posts on the tool:
+
+https://www.trustedsec.com/blog/persistence-through-service-workers-part-1-introduction-and-target-application-setup
+https://trustedsec.com/blog/persistence-through-service-workers-part-2-c2-setup-and-use
+
 ## Authors
 * [@libnex](https://twitter.com/libnex)
 * [@claudiocontin](https://twitter.com/claudiocontin)
